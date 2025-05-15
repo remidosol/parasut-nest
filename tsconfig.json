@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "strict": true,
+    "removeComments": false,
+    "noLib": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "target": "ES2021",
+    "sourceMap": false,
+    "outDir": "./dist",
+    "rootDir": "./lib",
+    "skipLibCheck": true,
+    "useUnknownInCatchVariables": false,
+    "baseUrl": "./"
+  },
+  "include": ["lib/**/*"],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts",
+    "tests",
+    "commitlint.config.ts",
+    "eslint.config.mjs"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "git": {
+    "commitMessage": "chore(): release v${version}",
+    "tagName": "v${version}",
+    "push": true,
+    "requireBranch": ["main", "master"],
+    "requireCleanWorkingDir": true,
+    "requireUpstream": true,
+    "changelog": "git log --pretty=format:\"* %s (%h)\" ${from}...${to}"
+  },
+  "github": {
+    "release": true,
+    "releaseName": "Release v${version}",
+    "draft": false,
+    "tokenRef": "${GITHUB_TOKEN}"
+  },
+  "npm": {
+    "publish": true,
+    "access": "public"
+  },
+  "hooks": {
+    "before:init": ["npm run lint", "npm run format"],
+    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "angular",
+      "infile": "CHANGELOG.md",
+      "outfile": "CHANGELOG.md",
+      "parserOpts": {
+        "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+      }
+    }
+  }
+}
