@@ -1,11 +1,3 @@
-import { BaseResponse } from "../../../../../dto/response";
-import {
-  Currency,
-  InvoiceDiscountType,
-  PaymentStatus,
-  SalesInvoiceItemType,
-} from "../../../../../types/common.enums";
-
 export type SalesInvoiceAttributes = {
   archived?: boolean;
   invoice_no?: string;
@@ -21,19 +13,27 @@ export type SalesInvoiceAttributes = {
   before_taxes_total?: number;
   remaining?: number;
   remaining_in_trl?: number;
-  payment_status?: PaymentStatus;
+  payment_status?: "paid" | "overdue" | "unpaid" | "partially_paid";
   created_at?: Date;
   updated_at?: Date;
-  item_type?: SalesInvoiceItemType;
+  item_type?:
+    | "invoice"
+    | "export"
+    | "estimate"
+    | "cancelled"
+    | "recurring_invoice"
+    | "recurring_estimate"
+    | "recurring_export"
+    | "refund";
   description?: string;
   issue_date: Date;
   due_date?: Date;
   invoice_series?: string;
   invoice_id?: number;
-  currency?: Currency;
+  currency?: "TRL" | "USD" | "EUR" | "GBP";
   exchange_rate?: number;
   withholding_rate?: number;
-  invoice_discount_type?: InvoiceDiscountType;
+  invoice_discount_type?: "percentage" | "amount";
   invoice_discount?: number;
   billing_address?: string;
   billing_postal_code?: string;
@@ -56,7 +56,7 @@ export type SalesInvoiceAttributes = {
   e_document_accounts?: null[];
 };
 
-export class SalesInvoiceResponse extends BaseResponse<
-  SalesInvoiceAttributes,
-  "sales_invoices"
-> {}
+// export type SalesInvoiceResponse = BaseResponse<
+//   SalesInvoiceAttributes,
+//   "sales_invoices"
+// >;

@@ -1,9 +1,7 @@
-import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../parasut.logger";
 import { CircuitState } from "./circuit-breaker.enum";
 import { CircuitBreakerOptions } from "./circuit-breaker.interface";
 
-@Injectable()
 export class CircuitBreaker {
   private state: CircuitState = CircuitState.CLOSED;
   private failureCount: number = 0;
@@ -17,11 +15,19 @@ export class CircuitBreaker {
     logger.setContext(CircuitBreaker.name);
 
     this.options = {
+      enabled: true,
       failureThreshold: options?.failureThreshold ?? 5,
       resetTimeout: options?.resetTimeout ?? 30000, // 30 seconds
     };
   }
 
+  /**
+   * Executes a function with circuit breaker protection.
+   * @template T - The return type of the function.
+   * @param fn - The function to execute.
+   * @returns A promise that resolves with the result of the function.
+   * @throws Error if the circuit is open or the function throws an error.
+   */
   async execute<T>(fn: () => Promise<T>): Promise<T> {
     if (this.state === CircuitState.OPEN) {
       if (Date.now() > this.nextAttempt) {
@@ -43,12 +49,20 @@ export class CircuitBreaker {
     }
   }
 
+  /**
+   * Handles a successful execution.
+   * Resets the failure count and sets the state to CLOSED.
+   */
   private success(): void {
     this.failureCount = 0;
     this.state = CircuitState.CLOSED;
     this.logger.log("Request successful, circuit breaker state: CLOSED");
   }
 
+  /**
+   * Handles a failed execution.
+   * Increments the failure count and potentially opens the circuit.
+   */
   private failure(): void {
     this.failureCount += 1;
     if (this.failureCount >= this.options.failureThreshold) {

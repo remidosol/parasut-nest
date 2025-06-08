@@ -79,12 +79,13 @@ export const createAsyncProviders = (
         provide: ParasutConfig,
         useFactory: (options: ParasutModuleOptions) => {
           return new ParasutConfig({
-            PARASUT_CLIENT_ID: options.credentials.clientId,
-            PARASUT_SECRET: options.credentials.clientSecret,
-            PARASUT_COMPANY_ID: options.credentials.companyId,
-            PARASUT_EMAIL: options.credentials.email,
-            PARASUT_PASSWORD: options.credentials.password,
-            PARASUT_ENV: options.credentials.environment,
+            parasutEnv: options.credentials.environment,
+            parasutClientId: options.credentials.clientId,
+            redirectUri: options.credentials.redirectUri,
+            parasutSecret: options.credentials.clientSecret,
+            parasutCompanyId: options.credentials.companyId,
+            parasutEmail: options.credentials.email,
+            parasutPassword: options.credentials.password,
             timeout: options.timeout,
           });
         },

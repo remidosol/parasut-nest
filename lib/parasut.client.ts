@@ -1,12 +1,11 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable, Optional } from "@nestjs/common";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { validate } from "class-validator";
 import { CircuitBreaker } from "./common/circuit-breaker/circuit-breaker.service";
 import { ParasutLoggerService } from "./common/parasut.logger";
-import { ParasutModuleOptions } from "./config/parasut-module.options";
+import { ParasutConfig } from "./config/parasut.config";
 import { ParasutAuthDto } from "./dto/request";
 import { AuthResponse } from "./dto/response";
-import { PARASUT_MODULE_OPTIONS } from "./parasut.constants";
 import { GrantType } from "./parasut.enum";
 
 @Injectable()
@@ -14,19 +13,18 @@ export class ParasutHttpClient {
   private readonly axiosInstance: AxiosInstance;
   private accessToken!: string;
   private refreshToken!: string;
-  private tokenExpiresAt!: number; // timestamp in milliseconds
+  private tokenExpiresAt!: number;
 
   constructor(
-    @Inject(PARASUT_MODULE_OPTIONS)
-    private readonly options: ParasutModuleOptions,
+    private readonly options: ParasutConfig,
     private readonly logger: ParasutLoggerService,
-    private readonly circuitBreaker: CircuitBreaker
+    @Optional() private readonly circuitBreaker?: CircuitBreaker
   ) {
     this.logger.setContext(ParasutHttpClient.name);
     logger.debug?.("ParasutHttpClient initialized");
 
     this.axiosInstance = axios.create({
-      baseURL: `https://api.parasut.com/v4/${this.options.credentials.companyId}`,
+      baseURL: `https://api.parasut.com/v4/${this.options.parasutCompanyId}`,
       timeout: this.options.timeout ?? 20000,
       headers: {
         "Content-Type": "application/json",
@@ -62,11 +60,11 @@ export class ParasutHttpClient {
   private async authenticate() {
     try {
       const reqDto = new ParasutAuthDto({
-        client_id: this.options.credentials.clientId,
-        client_secret: this.options.credentials.clientSecret,
-        redirect_uri: this.options.credentials.redirectUri,
-        username: this.options.credentials.email,
-        password: this.options.credentials.password,
+        client_id: this.options.parasutClientId,
+        client_secret: this.options.parasutSecret,
+        redirect_uri: this.options.redirectUri,
+        username: this.options.parasutEmail,
+        password: this.options.parasutPassword,
         grant_type: GrantType.PASSWORD,
       });
 
@@ -99,9 +97,9 @@ export class ParasutHttpClient {
   private async refresh(): Promise<boolean> {
     try {
       const reqDto = new ParasutAuthDto({
-        client_id: this.options.credentials.clientId,
-        client_secret: this.options.credentials.clientSecret,
-        redirect_uri: this.options.credentials.redirectUri,
+        client_id: this.options.parasutClientId,
+        client_secret: this.options.parasutSecret,
+        redirect_uri: this.options.redirectUri,
         refresh_token: this.refreshToken,
         grant_type: GrantType.REFRESH_TOKEN,
       });
@@ -170,36 +168,40 @@ export class ParasutHttpClient {
   ): Promise<ReturnType> {
     await this.ensureAuthenticated();
 
+    const requestPromise = async () => {
+      this.logger.verbose(`Making ${method.toUpperCase()} API call to ${url}`);
+
+      const requestConfig: AxiosRequestConfig = {
+        method,
+        url,
+        ...options,
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+          ...(options.headers || {}),
+        },
+      };
+
+      if (
+        data !== undefined &&
+        ["post", "put", "patch"].includes(method.toLowerCase())
+      ) {
+        requestConfig.data = data;
+      }
+
+      if (params !== undefined) {
+        requestConfig.params = params;
+      }
+
+      const response = await this.axiosInstance.request(requestConfig);
+      return response.data;
+    };
+
     try {
-      return await this.circuitBreaker.execute(async () => {
-        this.logger.verbose(
-          `Making ${method.toUpperCase()} API call to ${url}`
-        );
+      if (this.circuitBreaker) {
+        return await this.circuitBreaker.execute(requestPromise);
+      }
 
-        const requestConfig: AxiosRequestConfig = {
-          method,
-          url,
-          ...options,
-          headers: {
-            Authorization: `Bearer ${this.accessToken}`,
-            ...(options.headers || {}),
-          },
-        };
-
-        if (
-          data !== undefined &&
-          ["post", "put", "patch"].includes(method.toLowerCase())
-        ) {
-          requestConfig.data = data;
-        }
-
-        if (params !== undefined) {
-          requestConfig.params = params;
-        }
-
-        const response = await this.axiosInstance.request(requestConfig);
-        return response.data;
-      });
+      return await requestPromise();
     } catch (error) {
       this.logger.error(
         `${method.toUpperCase()} API request failed for ${url}`,
@@ -216,18 +218,25 @@ export class ParasutHttpClient {
    * @param options - Additional Axios request configuration
    * @returns Promise with the API response data
    */
-  async get<ReturnType, Params>(
+  async get<ReturnType, Params = unknown>(
     url: string,
     params?: Params,
     options: AxiosRequestConfig = {}
   ): Promise<ReturnType> {
-    return this.makeRequest<ReturnType, undefined, Params>(
-      "get",
-      url,
-      params,
-      undefined,
-      options
-    );
+    try {
+      const response = await this.makeRequest<ReturnType, undefined, Params>(
+        "get",
+        url,
+        params,
+        undefined,
+        options
+      );
+
+      return response;
+    } catch (err) {
+      this.logger.error("GET request failed", err);
+      throw err;
+    }
   }
 
   /**
@@ -238,19 +247,26 @@ export class ParasutHttpClient {
    * @param options - Additional Axios request configuration
    * @returns Promise with the API response data
    */
-  async post<ReturnType, Data, Params>(
+  async post<ReturnType, Data = unknown, Params = unknown>(
     url: string,
     params?: Params,
     data?: Data,
     options: AxiosRequestConfig = {}
   ): Promise<ReturnType> {
-    return this.makeRequest<ReturnType, Data, Params>(
-      "post",
-      url,
-      params,
-      data,
-      options
-    );
+    try {
+      const response = await this.makeRequest<ReturnType, Data, Params>(
+        "post",
+        url,
+        params,
+        data,
+        options
+      );
+
+      return response;
+    } catch (err) {
+      this.logger.error("POST request failed", err);
+      throw err;
+    }
   }
 
   /**
@@ -261,19 +277,26 @@ export class ParasutHttpClient {
    * @param options - Additional Axios request configuration
    * @returns Promise with the API response data
    */
-  async put<ReturnType, Data, Params>(
+  async put<ReturnType, Data = unknown, Params = unknown>(
     url: string,
     params?: Params,
     data?: Data,
     options: AxiosRequestConfig = {}
   ): Promise<ReturnType> {
-    return this.makeRequest<ReturnType, Data, Params>(
-      "put",
-      url,
-      params,
-      data,
-      options
-    );
+    try {
+      const response = await this.makeRequest<ReturnType, Data, Params>(
+        "put",
+        url,
+        params,
+        data,
+        options
+      );
+
+      return response;
+    } catch (err) {
+      this.logger.error("PUT request failed", err);
+      throw err;
+    }
   }
 
   /**
@@ -284,19 +307,26 @@ export class ParasutHttpClient {
    * @param options - Additional Axios request configuration
    * @returns Promise with the API response data
    */
-  async patch<ReturnType, Data, Params>(
+  async patch<ReturnType, Data = unknown, Params = unknown>(
     url: string,
     params?: Params,
     data?: Data,
     options: AxiosRequestConfig = {}
   ): Promise<ReturnType> {
-    return this.makeRequest<ReturnType, Data, Params>(
-      "patch",
-      url,
-      params,
-      data,
-      options
-    );
+    try {
+      const response = await this.makeRequest<ReturnType, Data, Params>(
+        "patch",
+        url,
+        params,
+        data,
+        options
+      );
+
+      return response;
+    } catch (err) {
+      this.logger.error("PATCH request failed", err);
+      throw err;
+    }
   }
 
   /**
@@ -306,17 +336,24 @@ export class ParasutHttpClient {
    * @param options - Additional Axios request configuration
    * @returns Promise with the API response data
    */
-  async delete<ReturnType, Params>(
+  async delete<Params = unknown>(
     url: string,
     params?: Params,
     options: AxiosRequestConfig = {}
-  ): Promise<ReturnType> {
-    return this.makeRequest<ReturnType, undefined, Params>(
-      "delete",
-      url,
-      params,
-      undefined,
-      options
-    );
+  ): Promise<boolean> {
+    try {
+      await this.makeRequest<undefined, undefined, Params>(
+        "delete",
+        url,
+        params,
+        undefined,
+        options
+      );
+
+      return true;
+    } catch (err) {
+      this.logger.error("DELETE request failed", err);
+      return false;
+    }
   }
 }

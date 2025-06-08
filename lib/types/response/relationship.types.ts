@@ -1,42 +1,7 @@
-export type ResponseType =
-  | "contacts"
-  | "sales_invoices"
-  | "purchase_bills"
-  | "taxes"
-  | "bank_fees"
-  | "salaries"
-  | "checks"
-  | "transactions"
-  | "sales_offer_details"
-  | "sales_invoice_details"
-  | "details"
-  | "activities"
-  | "sharings"
-  | "users"
-  | "user_roles"
-  | "companies"
-  | "payments"
-  | "accounts"
-  | "tags"
-  | "sales_offers"
-  | "recurrence_plans"
-  | "item_categories"
-  | "e_archives"
-  | "e_invoices"
-  | "contact_portals"
-  | "contact_people"
-  | "employees"
-  | "purchase_bill_details"
-  | "inventory_levels"
-  | "stock_movements"
-  | "warehouses"
-  | "products"
-  | "shipment_documents"
-  | "stock_update_details"
-  | "profiles";
+import { EntityType } from "../common.types";
 
 export type ResponseRelationshipsData<
-  T extends ResponseType,
+  T extends EntityType,
   isArray extends boolean = false,
 > = {
   data: isArray extends true
@@ -64,6 +29,8 @@ export type ResponseRelationships = {
     true
   >;
   activities?: ResponseRelationshipsData<"activities", true>;
+  collaborator?: ResponseRelationshipsData<"collaborators">;
+  shareable?: object;
   sharings?: ResponseRelationshipsData<"sharings", true>;
   managed_by_user?: ResponseRelationshipsData<"users">;
   managed_by_user_role?: ResponseRelationshipsData<"user_roles">;
@@ -105,30 +72,7 @@ export type ResponseRelationships = {
   >;
 };
 
-export type Included = {
-  id?: string;
-  type?: ResponseType;
-  attributes?: any;
-  relationships?: any;
-};
-
-export type Links = {
-  self?: string | null;
-  first?: string | null;
-  prev?: string | null;
-  next?: string | null;
-  last?: string | null;
-};
-
-export type Meta = {
-  current_page?: number;
-  total_pages?: number;
-  total_count?: number;
-  created_at?: Date;
-  updated_at?: Date;
-};
-
-export type ResponseRelationshipsByType<T extends ResponseType> =
+export type ResponseRelationshipsByType<T extends EntityType> =
   T extends "sales_offers"
     ? Pick<
         ResponseRelationships,
@@ -215,18 +159,14 @@ export type ResponseRelationshipsByType<T extends ResponseType> =
                                     >
                                   : T extends "tags"
                                     ? any
-                                    : T extends "users"
+                                    : T extends "sharings"
                                       ? Pick<
                                           ResponseRelationships,
-                                          "user_roles" | "company" | "profile"
+                                          "collaborator" | "shareable"
                                         >
-                                      : never;
-
-export type BaseResponseData<Attrs, Type extends ResponseType> = {
-  id?: string;
-  type?: Type;
-  attributes: Attrs;
-  relationships?: ResponseRelationshipsByType<Type>;
-  links?: Links;
-  meta?: Meta;
-};
+                                      : T extends "users"
+                                        ? Pick<
+                                            ResponseRelationships,
+                                            "user_roles" | "company" | "profile"
+                                          >
+                                        : never;

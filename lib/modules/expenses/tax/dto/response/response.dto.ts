@@ -1,5 +1,3 @@
-import { BaseResponse } from "../../../../../dto/response";
-
 export type TaxAttributes = {
   total_paid?: number;
   archived?: boolean;
@@ -13,4 +11,4 @@ export type TaxAttributes = {
   net_total: number;
 };
 
-export class TaxResponse extends BaseResponse<TaxAttributes, "taxes"> {}
+// export type TaxResponse = BaseResponse<TaxAttributes, "taxes">;

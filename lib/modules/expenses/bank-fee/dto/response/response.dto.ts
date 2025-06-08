@@ -1,6 +1,3 @@
-import { BaseResponse } from "../../../../../dto/response";
-import { Currency } from "../../../../../types/common.enums";
-
 export type BankFeeAttributes = {
   total_paid?: number;
   archived?: boolean;
@@ -9,14 +6,11 @@ export type BankFeeAttributes = {
   created_at?: Date;
   updated_at?: Date;
   description: string;
-  currency: Currency;
+  currency: "TRL" | "USD" | "EUR" | "GBP";
   issue_date: Date;
   due_date: Date;
   exchange_rate?: number;
   net_total: number;
 };
 
-export class BankFeeResponse extends BaseResponse<
-  BankFeeAttributes,
-  "bank_fees"
-> {}
+// export type BankFeeResponse = BaseResponse<BankFeeAttributes, "bank_fees">;

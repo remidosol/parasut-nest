@@ -1,9 +1,3 @@
-import { BaseResponse } from "../../../../../dto/response";
-import {
-  Currency,
-  PurchaseBillItemType,
-} from "../../../../../types/common.enums";
-
 export type PurchaseBillAttributes = {
   archived?: boolean;
   total_paid?: number;
@@ -24,12 +18,16 @@ export type PurchaseBillAttributes = {
   remaining_reimbursement_in_trl?: number;
   created_at?: Date;
   updated_at?: Date;
-  item_type: PurchaseBillItemType;
+  item_type:
+    | "purchase_bill"
+    | "cancelled"
+    | "recurring_purchase_bill"
+    | "refund";
   description?: string;
   issue_date: Date;
   due_date: Date;
   invoice_no?: string;
-  currency: Currency;
+  currency: "TRL" | "USD" | "EUR" | "GBP";
   exchange_rate?: number;
   net_total: number;
   withholding_rate?: number;
@@ -37,7 +35,7 @@ export type PurchaseBillAttributes = {
   invoice_discount?: number;
 };
 
-export class PurchaseBillResponse extends BaseResponse<
-  PurchaseBillAttributes,
-  "purchase_bills"
-> {}
+// export type PurchaseBillResponse = BaseResponse<
+//   PurchaseBillAttributes,
+//   "purchase_bills"
+// >;

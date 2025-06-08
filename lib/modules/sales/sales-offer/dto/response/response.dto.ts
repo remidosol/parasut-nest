@@ -1,9 +1,3 @@
-import { BaseResponse } from "../../../../../dto/response";
-import {
-  Currency,
-  InvoiceDiscountType,
-} from "../../../../../types/common.enums";
-
 export type SalesOfferAttributes = {
   content?: string;
   contact_type?: string;
@@ -25,10 +19,10 @@ export type SalesOfferAttributes = {
   description?: string;
   issue_date: Date;
   due_date?: Date;
-  currency?: Currency;
+  currency?: "TRL" | "USD" | "EUR" | "GBP";
   exchange_rate?: number;
   withholding_rate?: number;
-  invoice_discount_type?: InvoiceDiscountType;
+  invoice_discount_type?: "percentage" | "amount";
   invoice_discount?: number;
   billing_address?: string;
   billing_phone?: string;
@@ -42,7 +36,8 @@ export type SalesOfferAttributes = {
   order_date?: Date;
 };
 
-export class SalesOfferResponse extends BaseResponse<
-  SalesOfferAttributes,
-  "sales_offers"
-> {}
+// export type SalesOfferResponse<isArray extends boolean = false> = BaseResponse<
+//   SalesOfferAttributes,
+//   "sales_offers",
+//   isArray
+// >;

@@ -1,5 +1,3 @@
-import { BaseResponse } from "../../../../../dto/response";
-
 export type EmployeeAttributes = {
   balance?: number;
   trl_balance?: number;
@@ -14,7 +12,4 @@ export type EmployeeAttributes = {
   iban?: string;
 };
 
-export class EmployeeResponse extends BaseResponse<
-  EmployeeAttributes,
-  "employees"
-> {}
+// export type EmployeeResponse = BaseResponse<EmployeeAttributes, "employees">;

@@ -10,6 +10,7 @@ import {
 import {
   ParasutBankFeeModule,
   ParasutContactModule,
+  // ParasutContactService,
   ParasutEmployeeModule,
   ParasutFormalizationModule,
   ParasutPurchaseBillModule,
@@ -32,24 +33,34 @@ export class ParasutModule {
       },
     };
 
-    const circuitBreakerProvider: Provider = {
-      provide: CircuitBreaker,
-      useFactory: (
-        logger: ParasutLoggerService,
-        bexOptions: ParasutModuleOptions
-      ) => {
-        return new CircuitBreaker(logger, bexOptions.circuitBreakerOptions);
-      },
-      inject: [ParasutLoggerService, PARASUT_MODULE_OPTIONS],
-    };
+    let circuitBreakerProvider: Provider<CircuitBreaker> | null = null,
+      performanceServiceProvider: Provider<PerformanceService> | null = null;
 
-    const performanceServiceProvider: Provider = {
-      provide: PerformanceService,
-      useFactory: (logger: ParasutLoggerService) => {
-        return new PerformanceService(logger, options.performanceMetricOptions);
-      },
-      inject: [ParasutLoggerService],
-    };
+    if (options.circuitBreakerOptions?.enabled) {
+      circuitBreakerProvider = {
+        provide: CircuitBreaker,
+        useFactory: (
+          logger: ParasutLoggerService,
+          bexOptions: ParasutModuleOptions
+        ) => {
+          return new CircuitBreaker(logger, bexOptions.circuitBreakerOptions);
+        },
+        inject: [ParasutLoggerService, PARASUT_MODULE_OPTIONS],
+      };
+    }
+
+    if (options.performanceMetricOptions?.enabled) {
+      performanceServiceProvider = {
+        provide: PerformanceService,
+        useFactory: (logger: ParasutLoggerService) => {
+          return new PerformanceService(
+            logger,
+            options.performanceMetricOptions
+          );
+        },
+        inject: [ParasutLoggerService],
+      };
+    }
 
     const optionsProvider: Provider = {
       provide: PARASUT_MODULE_OPTIONS,
@@ -59,15 +70,37 @@ export class ParasutModule {
     const configProvider: Provider = {
       provide: ParasutConfig,
       useValue: new ParasutConfig({
-        PARASUT_ENV: options.credentials.environment,
-        PARASUT_CLIENT_ID: options.credentials.clientId,
-        PARASUT_SECRET: options.credentials.clientSecret,
-        PARASUT_COMPANY_ID: options.credentials.companyId,
-        PARASUT_EMAIL: options.credentials.email,
-        PARASUT_PASSWORD: options.credentials.password,
+        parasutEnv: options.credentials.environment,
+        parasutClientId: options.credentials.clientId,
+        redirectUri: options.credentials.redirectUri,
+        parasutSecret: options.credentials.clientSecret,
+        parasutCompanyId: options.credentials.companyId,
+        parasutEmail: options.credentials.email,
+        parasutPassword: options.credentials.password,
         timeout: options.timeout,
       }),
     };
+
+    // const asda = new ParasutContactService();
+
+    // asda.createContact({
+    //   data: {
+    //     type: "contacts",
+    //     attributes: {
+    //       name: "John Doe",
+    //       contact_type: "person",
+    //       account_type: "customer",
+    //     },
+    //     relationships: {
+    //       category: {
+    //         data: {
+    //           type: "item_categories",
+    //           attributes: {}
+    //         }
+    //       }
+    //     }
+    //   },
+    // });
 
     return {
       imports: [
@@ -86,8 +119,8 @@ export class ParasutModule {
         optionsProvider,
         configProvider,
         loggerProvider,
-        circuitBreakerProvider,
-        performanceServiceProvider,
+        ...(circuitBreakerProvider ? [circuitBreakerProvider] : []),
+        ...(performanceServiceProvider ? [performanceServiceProvider] : []),
         ParasutHttpClient,
       ],
       exports: [],
@@ -106,27 +139,35 @@ export class ParasutModule {
       inject: [PARASUT_MODULE_OPTIONS],
     };
 
-    const performanceServiceProvider: Provider = {
-      provide: PerformanceService,
-      useFactory: (
-        logger: ParasutLoggerService,
-        bexOptions: ParasutModuleOptions
-      ) => {
-        return new PerformanceService(
-          logger,
-          bexOptions.performanceMetricOptions
-        );
-      },
-      inject: [ParasutLoggerService, PARASUT_MODULE_OPTIONS],
-    };
-
-    const circuitBreakerProvider: Provider = {
+    const circuitBreakerProvider: Provider<CircuitBreaker | null> = {
       provide: CircuitBreaker,
       useFactory: (
         logger: ParasutLoggerService,
         bexOptions: ParasutModuleOptions
       ) => {
-        return new CircuitBreaker(logger, bexOptions.circuitBreakerOptions);
+        if (bexOptions.circuitBreakerOptions?.enabled) {
+          return new CircuitBreaker(logger, bexOptions.circuitBreakerOptions);
+        }
+
+        return null;
+      },
+      inject: [ParasutLoggerService, PARASUT_MODULE_OPTIONS],
+    };
+
+    const performanceServiceProvider: Provider<PerformanceService | null> = {
+      provide: PerformanceService,
+      useFactory: (
+        logger: ParasutLoggerService,
+        bexOptions: ParasutModuleOptions
+      ) => {
+        if (bexOptions.performanceMetricOptions?.enabled) {
+          return new PerformanceService(
+            logger,
+            bexOptions.performanceMetricOptions
+          );
+        }
+
+        return null;
       },
       inject: [ParasutLoggerService, PARASUT_MODULE_OPTIONS],
     };

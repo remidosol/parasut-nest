@@ -12,7 +12,12 @@ import globals from "globals";
 
 export default [
   {
-    ignores: ["node_modules/**", "dist/**", "**/*.spec.ts", "eslint.config.mjs"],
+    ignores: [
+      "node_modules/**",
+      "dist/**",
+      "**/*.spec.ts",
+      "eslint.config.mjs",
+    ],
   },
   {
     files: ["lib/**/*.ts"],
@@ -70,6 +75,7 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/adjacent-overload-signatures": "error",
       "@typescript-eslint/no-dupe-class-members": "error",
+      "@typescript-eslint/no-empty-object-type": "off",
       "@stylistic/ts/lines-between-class-members": [
         "error",
         {

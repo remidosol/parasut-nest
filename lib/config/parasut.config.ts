@@ -9,56 +9,61 @@ import {
   validateSync,
 } from "class-validator";
 import { ParasutEnvironment } from "../parasut.enum";
-// import { ParasutApiConfigurationException } from "../common/exceptions";
 
 export class ParasutConfig {
-  PARASUT_BASE_URL: string = "https://api.parasut.com/v4/";
+  parasutBaseUrl: string = "https://api.parasut.com/v4/";
 
   @IsNotEmpty({ message: "Merchant ID is required" })
   @IsString()
-  PARASUT_CLIENT_ID!: string;
+  parasutClientId!: string;
 
   @IsNotEmpty({ message: "Private Key is required" })
   @IsString()
-  PARASUT_SECRET!: string;
+  parasutSecret!: string;
+
+  @IsNotEmpty({ message: "Redirect URI is required" })
+  @IsString()
+  redirectUri!: string;
 
   @IsNotEmpty({ message: "Company id is required" })
   @IsString()
-  PARASUT_COMPANY_ID!: string;
+  parasutCompanyId!: string;
 
   @IsNotEmpty({ message: "Email is required" })
   @IsEmail()
-  PARASUT_EMAIL!: string;
+  parasutEmail!: string;
 
   @IsNotEmpty({ message: "Password is required" })
   @IsString()
-  PARASUT_PASSWORD!: string;
+  parasutPassword!: string;
 
   @IsString()
   @IsEnum(ParasutEnvironment)
-  PARASUT_ENV!: ParasutEnvironment;
+  parasutEnv!: ParasutEnvironment;
 
   @IsNumber()
   @IsOptional()
   timeout?: number;
 
   constructor(envs: {
-    PARASUT_CLIENT_ID: string;
-    PARASUT_SECRET: string;
-    PARASUT_COMPANY_ID: string;
-    PARASUT_EMAIL: string;
-    PARASUT_PASSWORD: string;
-    PARASUT_ENV: ParasutEnvironment;
+    parasutClientId: string;
+    parasutSecret: string;
+    redirectUri: string;
+    parasutCompanyId: string;
+    parasutEmail: string;
+    parasutPassword: string;
+    parasutEnv: ParasutEnvironment;
     timeout?: number;
   }) {
     validateEnvs(envs);
 
-    this.PARASUT_CLIENT_ID = envs.PARASUT_CLIENT_ID;
-    this.PARASUT_SECRET = envs.PARASUT_SECRET;
-    this.PARASUT_COMPANY_ID = envs.PARASUT_COMPANY_ID;
-    this.PARASUT_EMAIL = envs.PARASUT_EMAIL;
-    this.PARASUT_PASSWORD = envs.PARASUT_PASSWORD;
-    this.PARASUT_ENV = envs.PARASUT_ENV;
+    this.parasutClientId = envs.parasutClientId;
+    this.parasutSecret = envs.parasutSecret;
+    this.redirectUri = envs.redirectUri;
+    this.parasutCompanyId = envs.parasutCompanyId;
+    this.parasutEmail = envs.parasutEmail;
+    this.parasutPassword = envs.parasutPassword;
+    this.parasutEnv = envs.parasutEnv;
     this.timeout = envs.timeout;
   }
 }

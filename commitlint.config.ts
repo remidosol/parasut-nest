@@ -26,7 +26,20 @@ const Configuration: UserConfig = {
     "scope-enum": [
       RuleConfigSeverity.Error,
       "always",
-      ["merchant", "config", "core", "deps", "release"],
+      [
+        "client",
+        "config",
+        "core",
+        "deps",
+        "release",
+        "server",
+        "test",
+        "types",
+        "utils",
+        "dto",
+        "lib",
+        "docs",
+      ],
     ],
     "scope-case": [
       RuleConfigSeverity.Error,
