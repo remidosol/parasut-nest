@@ -1,4 +1,4 @@
-export type BankFeeAttributes = {
+export type TaxAttributes = {
   total_paid?: number;
   archived?: boolean;
   remaining?: number;
@@ -6,11 +6,9 @@ export type BankFeeAttributes = {
   created_at?: Date;
   updated_at?: Date;
   description: string;
-  currency: "TRL" | "USD" | "EUR" | "GBP";
   issue_date: Date;
   due_date: Date;
-  exchange_rate?: number;
   net_total: number;
 };
 
-// export type BankFeeResponse = BaseResponse<BankFeeAttributes, "bank_fees">;
+// export type TaxResponse = BaseResponse<TaxAttributes, "taxes">;

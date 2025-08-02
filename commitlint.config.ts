@@ -48,8 +48,8 @@ const Configuration: UserConfig = {
     ],
     "subject-full-stop": [RuleConfigSeverity.Error, "never", "."],
     "header-max-length": [RuleConfigSeverity.Error, "always", 120],
-    "body-max-length": [RuleConfigSeverity.Error, "always", 1000],
-    "body-max-line-length": [RuleConfigSeverity.Error, "always", 1000],
+    "body-max-length": [RuleConfigSeverity.Warning, "always", 1000],
+    "body-max-line-length": [RuleConfigSeverity.Warning, "always", 1000],
     "footer-max-length": [RuleConfigSeverity.Error, "always", 100],
   },
 };

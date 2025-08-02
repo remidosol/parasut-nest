@@ -2,7 +2,7 @@ import {
   CollectionResponse,
   SingleResponse,
 } from "../../../../../dto/response";
-import { TagResponseIncluded, TagResponseResource } from "../tag.attrs";
+import { TagResponseIncluded, TagResponseResource } from "../tag.attr";
 
 export type TagResponse = SingleResponse<
   TagResponseResource,

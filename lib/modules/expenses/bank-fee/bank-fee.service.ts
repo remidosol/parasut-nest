@@ -1,6 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../../../common/parasut.logger";
 import { ParasutHttpClient } from "../../../parasut.client";
+import { RequestIncludeByType } from "../../../types";
+import {
+  CreateBankFeeRequest,
+  PayBankFeeRequest,
+  UpdateBankFeeRequest,
+} from "./dto/request";
+import {
+  CreateBankFeeResponse,
+  GetBankFeeResponse,
+  PayBankFeeResponse,
+  UpdateBankFeeResponse,
+} from "./dto/response";
 
 @Injectable()
 export class ParasutBankFeeService {
@@ -17,17 +29,22 @@ export class ParasutBankFeeService {
    * @param include - Comma-separated list of relationships to include in the response (e.g., "category,tags").
    * @returns The created bank fee.
    */
-  async createBankFee(payload: any, include?: string): Promise<any> {
+  async createBankFee(
+    payload: CreateBankFeeRequest,
+    include?: RequestIncludeByType<"bank_fees">
+  ): Promise<CreateBankFeeResponse> {
     const params: { include?: string } = {};
+
     if (include) {
-      params.include = include;
+      params.include = include.join(",");
     }
 
-    const response = await this.parasutClient.post<any, any, any>(
-      "/bank_fees",
-      params,
-      payload
-    );
+    const response = await this.parasutClient.post<
+      CreateBankFeeResponse,
+      CreateBankFeeRequest,
+      { include?: string }
+    >("/bank_fees", params, payload);
+
     return response;
   }
 
@@ -37,16 +54,20 @@ export class ParasutBankFeeService {
    * @param include - Comma-separated list of relationships to include in the response (e.g., "category,tags").
    * @returns The bank fee.
    */
-  async getBankFeeById(id: number, include?: string): Promise<any> {
+  async getBankFeeById(
+    id: number,
+    include?: RequestIncludeByType<"bank_fees">
+  ): Promise<GetBankFeeResponse> {
     const params: { include?: string } = {};
+
     if (include) {
-      params.include = include;
+      params.include = include.join(",");
     }
 
-    const response = await this.parasutClient.get<any, any>(
-      `/bank_fees/${id}`,
-      params
-    );
+    const response = await this.parasutClient.get<
+      GetBankFeeResponse,
+      { include?: string }
+    >(`/bank_fees/${id}`, params);
     return response;
   }
 
@@ -59,19 +80,19 @@ export class ParasutBankFeeService {
    */
   async updateBankFee(
     id: number,
-    payload: any,
-    include?: string
-  ): Promise<any> {
+    payload: UpdateBankFeeRequest,
+    include?: RequestIncludeByType<"bank_fees">
+  ): Promise<UpdateBankFeeResponse> {
     const params: { include?: string } = {};
     if (include) {
-      params.include = include;
+      params.include = include.join(",");
     }
 
-    const response = await this.parasutClient.put<any, any, any>(
-      `/bank_fees/${id}`,
-      params,
-      payload
-    );
+    const response = await this.parasutClient.put<
+      UpdateBankFeeResponse,
+      UpdateBankFeeRequest,
+      { include?: string }
+    >(`/bank_fees/${id}`, params, payload);
     return response;
   }
 
@@ -80,8 +101,9 @@ export class ParasutBankFeeService {
    * @param id - The ID of the bank fee to delete.
    * @returns A promise that resolves when the bank fee is deleted.
    */
-  async deleteBankFee(id: number): Promise<any> {
-    const response = await this.parasutClient.delete<any>(`/bank_fees/${id}`);
+  async deleteBankFee(id: number): Promise<boolean> {
+    const response = await this.parasutClient.delete(`/bank_fees/${id}`);
+
     return response;
   }
 
@@ -91,16 +113,20 @@ export class ParasutBankFeeService {
    * @param include - Comma-separated list of relationships to include in the response (e.g., "category,tags").
    * @returns The archived bank fee.
    */
-  async archiveBankFee(id: number, include?: string): Promise<any> {
+  async archiveBankFee(
+    id: number,
+    include?: RequestIncludeByType<"bank_fees">
+  ): Promise<GetBankFeeResponse> {
     const params: { include?: string } = {};
     if (include) {
-      params.include = include;
+      params.include = include.join(",");
     }
 
-    const response = await this.parasutClient.patch<any, any>(
-      `/bank_fees/${id}/archive`,
-      params
-    );
+    const response = await this.parasutClient.patch<
+      GetBankFeeResponse,
+      undefined,
+      { include?: string }
+    >(`/bank_fees/${id}/archive`, params);
     return response;
   }
 
@@ -110,16 +136,20 @@ export class ParasutBankFeeService {
    * @param include - Comma-separated list of relationships to include in the response (e.g., "category,tags").
    * @returns The unarchived bank fee.
    */
-  async unarchiveBankFee(id: number, include?: string): Promise<any> {
+  async unarchiveBankFee(
+    id: number,
+    include?: RequestIncludeByType<"bank_fees">
+  ): Promise<GetBankFeeResponse> {
     const params: { include?: string } = {};
     if (include) {
-      params.include = include;
+      params.include = include.join(",");
     }
 
-    const response = await this.parasutClient.patch<any, any>(
-      `/bank_fees/${id}/unarchive`,
-      params
-    );
+    const response = await this.parasutClient.patch<
+      GetBankFeeResponse,
+      undefined,
+      { include?: string }
+    >(`/bank_fees/${id}/unarchive`, params);
     return response;
   }
 
@@ -130,17 +160,15 @@ export class ParasutBankFeeService {
    * @param include - Comma-separated list of relationships to include in the response (e.g., "payable,transaction").
    * @returns The payment transaction.
    */
-  async payBankFee(id: number, payload: any, include?: string): Promise<any> {
-    const params: { include?: string } = {};
-    if (include) {
-      params.include = include;
-    }
+  async payBankFee(
+    id: number,
+    payload: PayBankFeeRequest
+  ): Promise<PayBankFeeResponse> {
+    const response = await this.parasutClient.post<
+      PayBankFeeResponse,
+      PayBankFeeRequest
+    >(`/bank_fees/${id}/payments`, undefined, payload);
 
-    const response = await this.parasutClient.post<any, any, any>(
-      `/bank_fees/${id}/payments`,
-      params,
-      payload
-    );
     return response;
   }
 }
