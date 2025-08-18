@@ -1,4 +1,3 @@
-import { ApiProperty } from "@nestjs/swagger";
 import {
   IsEmail,
   IsEnum,
@@ -12,32 +11,26 @@ import { GrantType } from "../../parasut.enum";
 export class ParasutAuthDto {
   @IsNotEmpty()
   @IsEnum(GrantType)
-  @ApiProperty({ example: GrantType.PASSWORD })
   grant_type!: GrantType;
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ example: "your-client-id" })
   client_id!: string;
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ example: "your-client-secret" })
   client_secret!: string;
 
   @ValidateIf((o: ParasutAuthDto) => o.grant_type === GrantType.PASSWORD)
   @IsEmail()
-  @ApiProperty({ example: "john@doe.com" })
   username?: string;
 
   @ValidateIf((o: ParasutAuthDto) => o.grant_type === GrantType.PASSWORD)
   @IsString()
-  @ApiProperty({ example: "p4ssw0rd" })
   password?: string;
 
   @ValidateIf((o: ParasutAuthDto) => o.grant_type === GrantType.REFRESH_TOKEN)
   @IsString()
-  @ApiProperty({ example: "asdasdadddsaas" })
   refresh_token?: string;
 
   @ValidateIf(
@@ -46,7 +39,6 @@ export class ParasutAuthDto {
       o.grant_type === GrantType.PASSWORD
   )
   @IsUrl({ require_tld: false })
-  @ApiProperty({ example: "urn:ietf:wg:oauth:2.0:oob" })
   redirect_uri?: string;
 
   constructor(dto?: ParasutAuthDto) {
