@@ -50,16 +50,16 @@ The `parasut-nest` package is a NestJS module designed to provide a structured a
 To install the package, run:
 
 ```bash
-npm install @your-org/parasut-nest # Placeholder, replace with actual package name
+npm install @remidosol/parasut-nest
 # or
-yarn add @your-org/parasut-nest
+yarn add @remidosol/parasut-nest
 ```
 
 **Synchronous Module Registration:**
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { ParasutModule } from '@your-org/parasut-nest'; // Placeholder
+import { ParasutModule } from '@remidosol/parasut-nest'; 
 
 @Module({
   imports: [
@@ -89,25 +89,27 @@ export class AppModule {}
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { ParasutModule, ParasutModuleOptions } from '@your-org/parasut-nest'; // Placeholder
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ParasutModule, ParasutModuleOptions } from '@remidosol/parasut-nest'; 
 
 @Module({
   imports: [
     ParasutModule.forRootAsync({
-      useFactory: async (): Promise<ParasutModuleOptions> => ({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService): Promise<ParasutModuleOptions> => ({
         credentials: {
-          environment: process.env.NODE_ENV === 'production' ? ParasutEnvironment.PRODUCTION : ParasutEnvironment.DEV,
-          clientId: process.env.PARASUT_CLIENT_ID,
-          clientSecret: process.env.PARASUT_CLIENT_SECRET,
-          companyId: process.env.PARASUT_COMPANY_ID,
-          email: process.env.PARASUT_EMAIL,
-          password: process.env.PARASUT_PASSWORD,
-          redirectUri: process.env.PARASUT_REDIRECT_URI,
+          environment: configService.get("NODE_ENV") === 'production' ? ParasutEnvironment.PRODUCTION : ParasutEnvironment.DEV,
+          clientId: configService.get("PARASUT_CLIENT_ID"),
+          clientSecret: configService.get("PARASUT_CLIENT_SECRET"),
+          companyId: configService.get("PARASUT_COMPANY_ID"),
+          email: configService.get("PARASUT_EMAIL"),
+          password: configService.get("PARASUT_PASSWORD"),
+          redirectUri: configService.get("PARASUT_REDIRECT_URI"),
         },
         timeout: 30000,
         // ... other options
       }),
-      inject: [], // Inject any dependencies needed by the factory
+      inject: [ConfigService],
     }),
   ],
   // ...other module configurations
