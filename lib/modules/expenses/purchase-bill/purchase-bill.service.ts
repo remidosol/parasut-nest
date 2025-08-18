@@ -1,6 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../../../common/parasut.logger";
 import { ParasutHttpClient } from "../../../parasut.client";
+import { RequestIncludeByType } from "../../../types";
+import {
+  CreatePurchaseBillRequest,
+  UpdatePurchaseBillRequest,
+} from "./dto/request";
+import { PayPurchaseBillResponse } from "./dto/response/payment-response.dto";
+import {
+  CreatePurchaseBillResponse,
+  GetPurchaseBillResponse,
+  IndexPurchaseBillResponse,
+  UpdatePurchaseBillResponse,
+} from "./dto/response/response.dto";
 
 @Injectable()
 export class ParasutPurchaseBillService {
@@ -20,7 +32,9 @@ export class ParasutPurchaseBillService {
    *   - include: string (e.g., "category,spender,details,details.product,details.warehouse,payments")
    * @returns A list of purchase bills.
    */
-  async getPurchaseBills(queryParams?: any): Promise<any> {
+  async getPurchaseBills(
+    queryParams?: any
+  ): Promise<IndexPurchaseBillResponse> {
     const params: any = {};
     if (queryParams) {
       if (queryParams.filter) {
@@ -44,7 +58,10 @@ export class ParasutPurchaseBillService {
       if (queryParams.include) params.include = queryParams.include;
     }
 
-    return this.parasutClient.get<any, any>("/purchase_bills", params);
+    return this.parasutClient.get<IndexPurchaseBillResponse, any>(
+      "/purchase_bills",
+      params
+    );
   }
 
   /**
@@ -54,14 +71,17 @@ export class ParasutPurchaseBillService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The created purchase bill.
    */
-  async createBasicPurchaseBill(payload: any, include?: string): Promise<any> {
+  async createBasicPurchaseBill(
+    payload: CreatePurchaseBillRequest,
+    include?: RequestIncludeByType<"purchase_bills">
+  ): Promise<CreatePurchaseBillResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.post<any, any, any>(
-      "/purchase_bills",
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.post<
+      CreatePurchaseBillResponse,
+      CreatePurchaseBillRequest,
+      { include?: string }
+    >("/purchase_bills", params, payload);
   }
 
   /**
@@ -72,16 +92,16 @@ export class ParasutPurchaseBillService {
    * @returns The created purchase bill.
    */
   async createDetailedPurchaseBill(
-    payload: any,
-    include?: string
-  ): Promise<any> {
+    payload: CreatePurchaseBillRequest,
+    include?: RequestIncludeByType<"purchase_bills">
+  ): Promise<CreatePurchaseBillResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.post<any, any, any>(
-      "/purchase_bills",
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.post<
+      CreatePurchaseBillResponse,
+      CreatePurchaseBillRequest,
+      { include?: string }
+    >("/purchase_bills", params, payload);
   }
 
   /**
@@ -90,10 +110,16 @@ export class ParasutPurchaseBillService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The purchase bill.
    */
-  async getPurchaseBillById(id: number, include?: string): Promise<any> {
+  async getPurchaseBillById(
+    id: number,
+    include?: RequestIncludeByType<"purchase_bills">
+  ): Promise<GetPurchaseBillResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.get<any, any>(`/purchase_bills/${id}`, params);
+    if (include) params.include = include.join(",");
+    return this.parasutClient.get<
+      GetPurchaseBillResponse,
+      { include?: string }
+    >(`/purchase_bills/${id}`, params);
   }
 
   /**
@@ -101,8 +127,8 @@ export class ParasutPurchaseBillService {
    * @param id - The ID of the purchase bill to delete.
    * @returns A promise that resolves when the purchase bill is deleted.
    */
-  async deletePurchaseBill(id: number): Promise<any> {
-    return this.parasutClient.delete<any>(`/purchase_bills/${id}`);
+  async deletePurchaseBill(id: number): Promise<boolean> {
+    return this.parasutClient.delete(`/purchase_bills/${id}`);
   }
 
   /**
@@ -115,16 +141,16 @@ export class ParasutPurchaseBillService {
    */
   async editBasicPurchaseBill(
     id: number,
-    payload: any,
-    include?: string
-  ): Promise<any> {
+    payload: UpdatePurchaseBillRequest,
+    include?: RequestIncludeByType<"purchase_bills">
+  ): Promise<UpdatePurchaseBillResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.put<any, any, any>(
-      `/purchase_bills/${id}`,
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.put<
+      UpdatePurchaseBillResponse,
+      UpdatePurchaseBillRequest,
+      { include?: string }
+    >(`/purchase_bills/${id}`, params, payload);
   }
 
   /**
@@ -137,16 +163,16 @@ export class ParasutPurchaseBillService {
    */
   async editDetailedPurchaseBill(
     id: number,
-    payload: any,
-    include?: string
-  ): Promise<any> {
+    payload: UpdatePurchaseBillRequest,
+    include?: RequestIncludeByType<"purchase_bills">
+  ): Promise<UpdatePurchaseBillResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.put<any, any, any>(
-      `/purchase_bills/${id}`,
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.put<
+      UpdatePurchaseBillResponse,
+      UpdatePurchaseBillRequest,
+      { include?: string }
+    >(`/purchase_bills/${id}`, params, payload);
   }
 
   /**
@@ -159,15 +185,15 @@ export class ParasutPurchaseBillService {
   async payPurchaseBill(
     id: number,
     payload: any,
-    include?: string
-  ): Promise<any> {
+    include?: RequestIncludeByType<"purchase_bills">
+  ): Promise<PayPurchaseBillResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.post<any, any, any>(
-      `/purchase_bills/${id}/payments`,
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.post<
+      PayPurchaseBillResponse,
+      any,
+      { include?: string }
+    >(`/purchase_bills/${id}/payments`, params, payload);
   }
 
   /**
@@ -176,13 +202,13 @@ export class ParasutPurchaseBillService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The response from the cancel operation.
    */
-  async cancelPurchaseBill(id: number, include?: string): Promise<any> {
+  async cancelPurchaseBill(
+    id: number,
+    include?: RequestIncludeByType<"purchase_bills">
+  ): Promise<boolean> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.delete<any>(
-      `/purchase_bills/${id}/cancel`,
-      params
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.delete(`/purchase_bills/${id}/cancel`, params);
   }
 
   /**
@@ -191,13 +217,17 @@ export class ParasutPurchaseBillService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The recovered purchase bill.
    */
-  async recoverPurchaseBill(id: number, include?: string): Promise<any> {
+  async recoverPurchaseBill(
+    id: number,
+    include?: RequestIncludeByType<"purchase_bills">
+  ): Promise<GetPurchaseBillResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.patch<any, any>(
-      `/purchase_bills/${id}/recover`,
-      params
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.patch<
+      GetPurchaseBillResponse,
+      undefined,
+      { include?: string }
+    >(`/purchase_bills/${id}/recover`, params);
   }
 
   /**
@@ -206,13 +236,17 @@ export class ParasutPurchaseBillService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The archived purchase bill.
    */
-  async archivePurchaseBill(id: number, include?: string): Promise<any> {
+  async archivePurchaseBill(
+    id: number,
+    include?: RequestIncludeByType<"purchase_bills">
+  ): Promise<GetPurchaseBillResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.patch<any, any>(
-      `/purchase_bills/${id}/archive`,
-      params
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.patch<
+      GetPurchaseBillResponse,
+      undefined,
+      { include?: string }
+    >(`/purchase_bills/${id}/archive`, params);
   }
 
   /**
@@ -221,12 +255,16 @@ export class ParasutPurchaseBillService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The unarchived purchase bill.
    */
-  async unarchivePurchaseBill(id: number, include?: string): Promise<any> {
+  async unarchivePurchaseBill(
+    id: number,
+    include?: RequestIncludeByType<"purchase_bills">
+  ): Promise<GetPurchaseBillResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.patch<any, any>(
-      `/purchase_bills/${id}/unarchive`,
-      params
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.patch<
+      GetPurchaseBillResponse,
+      undefined,
+      { include?: string }
+    >(`/purchase_bills/${id}/unarchive`, params);
   }
 }

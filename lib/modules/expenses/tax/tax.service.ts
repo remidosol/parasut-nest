@@ -1,6 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../../../common/parasut.logger";
 import { ParasutHttpClient } from "../../../parasut.client";
+import {
+  CreateTaxRequest,
+  PayTaxRequest,
+  UpdateTaxRequest,
+} from "./dto/request";
+import { PayTaxResponse } from "./dto/response/payment-response.dto";
+import {
+  CreateTaxResponse,
+  GetTaxResponse,
+  IndexTaxResponse,
+  UpdateTaxResponse,
+} from "./dto/response/response.dto";
 
 @Injectable()
 export class ParasutTaxService {
@@ -20,7 +32,7 @@ export class ParasutTaxService {
    *   - include: string (e.g., "category,tags")
    * @returns A list of taxes.
    */
-  async getTaxes(queryParams?: any): Promise<any> {
+  async getTaxes(queryParams?: any): Promise<IndexTaxResponse> {
     const params: any = {};
     if (queryParams) {
       if (queryParams.filter) {
@@ -42,46 +54,42 @@ export class ParasutTaxService {
       if (queryParams.include) params.include = queryParams.include;
     }
 
-    return this.parasutClient.get<any, any>("/taxes", params);
+    return this.parasutClient.get<IndexTaxResponse, any>("/taxes", params);
   }
 
   /**
    * Creates a new tax.
    * @param payload - The tax data.
-   * @param include - Comma-separated list of relationships to include in the response (e.g., "category,tags").
    * @returns The created tax.
    */
-  async createTax(payload: any, include?: string): Promise<any> {
-    const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.post<any, any, any>("/taxes", params, payload);
+  async createTax(payload: CreateTaxRequest): Promise<CreateTaxResponse> {
+    return this.parasutClient.post<CreateTaxResponse, CreateTaxRequest>(
+      "/taxes",
+      payload
+    );
   }
 
   /**
    * Retrieves a specific tax by its ID.
    * @param id - The ID of the tax.
-   * @param include - Comma-separated list of relationships to include in the response (e.g., "category,tags").
    * @returns The tax.
    */
-  async getTaxById(id: number, include?: string): Promise<any> {
-    const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.get<any, any>(`/taxes/${id}`, params);
+  async getTaxById(id: number): Promise<GetTaxResponse> {
+    return this.parasutClient.get<GetTaxResponse>(`/taxes/${id}`);
   }
 
   /**
    * Updates an existing tax.
    * @param id - The ID of the tax to update.
    * @param payload - The updated tax data.
-   * @param include - Comma-separated list of relationships to include in the response (e.g., "category,tags").
    * @returns The updated tax.
    */
-  async updateTax(id: number, payload: any, include?: string): Promise<any> {
-    const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.put<any, any, any>(
+  async updateTax(
+    id: number,
+    payload: UpdateTaxRequest
+  ): Promise<UpdateTaxResponse> {
+    return this.parasutClient.put<UpdateTaxResponse, UpdateTaxRequest>(
       `/taxes/${id}`,
-      params,
       payload
     );
   }
@@ -91,47 +99,41 @@ export class ParasutTaxService {
    * @param id - The ID of the tax to delete.
    * @returns A promise that resolves when the tax is deleted.
    */
-  async deleteTax(id: number): Promise<any> {
-    return this.parasutClient.delete<any>(`/taxes/${id}`);
+  async deleteTax(id: number): Promise<boolean> {
+    return this.parasutClient.delete(`/taxes/${id}`);
   }
 
   /**
    * Archives a tax by its ID.
    * @param id - The ID of the tax to archive.
-   * @param include - Comma-separated list of relationships to include in the response (e.g., "category,tags").
    * @returns The archived tax.
    */
-  async archiveTax(id: number, include?: string): Promise<any> {
-    const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.patch<any, any>(`/taxes/${id}/archive`, params);
+  async archiveTax(id: number): Promise<GetTaxResponse> {
+    return this.parasutClient.patch<GetTaxResponse, undefined>(
+      `/taxes/${id}/archive`
+    );
   }
 
   /**
    * Unarchives a tax by its ID.
    * @param id - The ID of the tax to unarchive.
-   * @param include - Comma-separated list of relationships to include in the response (e.g., "category,tags").
    * @returns The unarchived tax.
    */
-  async unarchiveTax(id: number, include?: string): Promise<any> {
-    const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.patch<any, any>(`/taxes/${id}/unarchive`, params);
+  async unarchiveTax(id: number): Promise<GetTaxResponse> {
+    return this.parasutClient.patch<GetTaxResponse, undefined>(
+      `/taxes/${id}/unarchive`
+    );
   }
 
   /**
    * Pays a tax.
    * @param id - The ID of the tax.
    * @param payload - The payment data.
-   * @param include - Comma-separated list of relationships to include in the response (e.g., "payable,transaction").
    * @returns The payment transaction.
    */
-  async payTax(id: number, payload: any, include?: string): Promise<any> {
-    const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.post<any, any, any>(
+  async payTax(id: number, payload: PayTaxRequest): Promise<PayTaxResponse> {
+    return this.parasutClient.post<PayTaxResponse, PayTaxRequest>(
       `/taxes/${id}/payments`,
-      params,
       payload
     );
   }

@@ -1,7 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../../../common/parasut.logger";
+import { SingleRequest } from "../../../dto/request";
 import { ParasutHttpClient } from "../../../parasut.client";
 import { RequestIncludeByType } from "../../../types";
+import { CategoryRequestResource } from "./dto/category.attr";
 import {
   CategoryArrayResponse,
   CategoryResponse,
@@ -25,7 +27,12 @@ export class ParasutCategoryService {
    *   - include: string (e.g., "parent_category,subcategories")
    * @returns A list of item categories.
    */
-  async getItemCategories(queryParams?: any): Promise<CategoryArrayResponse> {
+  async getItemCategories(queryParams?: {
+    filter?: { name?: string; category_type?: string };
+    sort?: string;
+    page?: { number?: number; size?: number };
+    include?: string;
+  }): Promise<CategoryArrayResponse> {
     const params: any = {};
 
     if (queryParams) {
@@ -57,7 +64,7 @@ export class ParasutCategoryService {
    * @returns The created item category.
    */
   async createItemCategory(
-    payload: any,
+    payload: SingleRequest<CategoryRequestResource>,
     include?: RequestIncludeByType<"item_categories">
   ): Promise<CategoryResponse> {
     const params: { include?: string } = {};
@@ -66,11 +73,11 @@ export class ParasutCategoryService {
       params.include = include.join(",");
     }
 
-    return this.parasutClient.post<CategoryResponse, any, any>(
-      "/item_categories",
-      params,
-      payload
-    );
+    return this.parasutClient.post<
+      CategoryResponse,
+      SingleRequest<CategoryRequestResource>,
+      { include?: string }
+    >("/item_categories", params, payload);
   }
 
   /**
@@ -104,17 +111,17 @@ export class ParasutCategoryService {
    */
   async updateItemCategory(
     id: number,
-    payload: any,
+    payload: Partial<SingleRequest<CategoryRequestResource>>,
     include?: string
-  ): Promise<any> {
+  ): Promise<CategoryResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include;
 
-    return this.parasutClient.put<any, any, any>(
-      `/item_categories/${id}`,
-      params,
-      payload
-    );
+    return this.parasutClient.put<
+      CategoryResponse,
+      Partial<SingleRequest<CategoryRequestResource>>,
+      { include?: string }
+    >(`/item_categories/${id}`, params, payload);
   }
 
   /**
@@ -122,8 +129,7 @@ export class ParasutCategoryService {
    * @param id - The ID of the item category to delete.
    * @returns A promise that resolves when the item category is deleted (typically void or boolean).
    */
-  async deleteItemCategory(id: number): Promise<any> {
-    // API returns 204 No Content, client might return void or a response object.
-    return this.parasutClient.delete<any>(`/item_categories/${id}`);
+  async deleteItemCategory(id: number): Promise<boolean> {
+    return this.parasutClient.delete(`/item_categories/${id}`);
   }
 }

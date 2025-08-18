@@ -1,7 +1,7 @@
 {
-  "name": "@westudio/parasut-nest",
+  "name": "@remidosol/parasut-nest",
   "version": "1.0.0",
-  "description": "",
+  "description": "Parasut API client for NestJS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

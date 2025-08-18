@@ -1,6 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../../common/parasut.logger";
 import { ParasutHttpClient } from "../../parasut.client";
+import {
+  CreateEArchiveResponse,
+  CreateEInvoiceResponse,
+  CreateESmmResponse,
+  EArchivePdfResponse,
+  EInvoicePdfResponse,
+  ESmmPdfResponse,
+  GetEArchiveResponse,
+  GetEInvoiceResponse,
+  GetESmmResponse,
+  IndexEInvoiceInboxResponse,
+} from "./dto/response/response.dto";
 
 @Injectable()
 export class ParasutFormalizationService {
@@ -20,7 +32,9 @@ export class ParasutFormalizationService {
    *   - page: { number?: number, size?: number }
    * @returns A list of e-invoice inboxes.
    */
-  async getEInvoiceInboxes(queryParams?: any): Promise<any> {
+  async getEInvoiceInboxes(
+    queryParams?: any
+  ): Promise<IndexEInvoiceInboxResponse> {
     const params: any = {};
     if (queryParams) {
       if (queryParams.filter) {
@@ -33,7 +47,10 @@ export class ParasutFormalizationService {
         if (queryParams.page.size) params["page[size]"] = queryParams.page.size;
       }
     }
-    return this.parasutClient.get<any, any>("/e_invoice_inboxes", params);
+    return this.parasutClient.get<IndexEInvoiceInboxResponse, any>(
+      "/e_invoice_inboxes",
+      params
+    );
   }
 
   // --- E-Archives ---
@@ -43,10 +60,14 @@ export class ParasutFormalizationService {
    * @param payload - The e-archive data.
    * @returns The created e-archive.
    */
-  async createEArchive(payload: any): Promise<any> {
+  async createEArchive(payload: any): Promise<CreateEArchiveResponse> {
     // Note: The 'include' parameter is not specified in the image for create.
     // If it were available, it would be added like other services.
-    return this.parasutClient.post<any, any, any>("/e_archives", {}, payload);
+    return this.parasutClient.post<CreateEArchiveResponse, any, any>(
+      "/e_archives",
+      {},
+      payload
+    );
   }
 
   /**
@@ -55,10 +76,16 @@ export class ParasutFormalizationService {
    * @param include - Comma-separated list of relationships to include (e.g., "sales_invoice").
    * @returns The e-archive.
    */
-  async getEArchiveById(id: string, include?: string): Promise<any> {
+  async getEArchiveById(
+    id: string,
+    include?: string
+  ): Promise<GetEArchiveResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include;
-    return this.parasutClient.get<any, any>(`/e_archives/${id}`, params);
+    return this.parasutClient.get<GetEArchiveResponse, any>(
+      `/e_archives/${id}`,
+      params
+    );
   }
 
   /**
@@ -66,8 +93,11 @@ export class ParasutFormalizationService {
    * @param id - The ID of the e-archive.
    * @returns The e-archive PDF data.
    */
-  async getEArchivePdf(id: string): Promise<any> {
-    return this.parasutClient.get<any, any>(`/e_archives/${id}/pdf`, {});
+  async getEArchivePdf(id: string): Promise<EArchivePdfResponse> {
+    return this.parasutClient.get<EArchivePdfResponse, any>(
+      `/e_archives/${id}/pdf`,
+      {}
+    );
   }
 
   // --- E-Invoices ---
@@ -77,9 +107,13 @@ export class ParasutFormalizationService {
    * @param payload - The e-invoice data.
    * @returns The created e-invoice.
    */
-  async createEInvoice(payload: any): Promise<any> {
+  async createEInvoice(payload: any): Promise<CreateEInvoiceResponse> {
     // Note: The 'include' parameter is not specified in the image for create.
-    return this.parasutClient.post<any, any, any>("/e_invoices", {}, payload);
+    return this.parasutClient.post<CreateEInvoiceResponse, any, any>(
+      "/e_invoices",
+      {},
+      payload
+    );
   }
 
   /**
@@ -88,10 +122,16 @@ export class ParasutFormalizationService {
    * @param include - Comma-separated list of relationships to include (e.g., "invoice").
    * @returns The e-invoice.
    */
-  async getEInvoiceById(id: string, include?: string): Promise<any> {
+  async getEInvoiceById(
+    id: string,
+    include?: string
+  ): Promise<GetEInvoiceResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include;
-    return this.parasutClient.get<any, any>(`/e_invoices/${id}`, params);
+    return this.parasutClient.get<GetEInvoiceResponse, any>(
+      `/e_invoices/${id}`,
+      params
+    );
   }
 
   /**
@@ -99,8 +139,11 @@ export class ParasutFormalizationService {
    * @param id - The ID of the e-invoice.
    * @returns The e-invoice PDF data.
    */
-  async getEInvoicePdf(id: string): Promise<any> {
-    return this.parasutClient.get<any, any>(`/e_invoices/${id}/pdf`, {});
+  async getEInvoicePdf(id: string): Promise<EInvoicePdfResponse> {
+    return this.parasutClient.get<EInvoicePdfResponse, any>(
+      `/e_invoices/${id}/pdf`,
+      {}
+    );
   }
 
   // --- E-SMMs (Freelance Receipts) ---
@@ -110,9 +153,13 @@ export class ParasutFormalizationService {
    * @param payload - The e-SMM data.
    * @returns The created e-SMM.
    */
-  async createESmm(payload: any): Promise<any> {
+  async createESmm(payload: any): Promise<CreateESmmResponse> {
     // Note: The 'include' parameter is not specified in the image for create.
-    return this.parasutClient.post<any, any, any>("/e_smms", {}, payload);
+    return this.parasutClient.post<CreateESmmResponse, any, any>(
+      "/e_smms",
+      {},
+      payload
+    );
   }
 
   /**
@@ -121,10 +168,13 @@ export class ParasutFormalizationService {
    * @param include - Comma-separated list of relationships to include (e.g., "sales_invoice").
    * @returns The e-SMM.
    */
-  async getESmmById(id: string, include?: string): Promise<any> {
+  async getESmmById(id: string, include?: string): Promise<GetESmmResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include;
-    return this.parasutClient.get<any, any>(`/e_smms/${id}`, params);
+    return this.parasutClient.get<GetESmmResponse, any>(
+      `/e_smms/${id}`,
+      params
+    );
   }
 
   /**
@@ -132,7 +182,10 @@ export class ParasutFormalizationService {
    * @param id - The ID of the e-SMM.
    * @returns The e-SMM PDF data.
    */
-  async getESmmPdf(id: string): Promise<any> {
-    return this.parasutClient.get<any, any>(`/e_smms/${id}/pdf`, {});
+  async getESmmPdf(id: string): Promise<ESmmPdfResponse> {
+    return this.parasutClient.get<ESmmPdfResponse, any>(
+      `/e_smms/${id}/pdf`,
+      {}
+    );
   }
 }

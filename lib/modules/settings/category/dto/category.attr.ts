@@ -1,5 +1,6 @@
 import {
   PromoteResponseIdentifiers,
+  RequestResource,
   ResponseIncludedFrom,
   ResponseRelationship,
   ResponseResource,
@@ -31,3 +32,8 @@ type CategoryResponseRelInc = ResponseIncludedFrom<CategoryResponseResource>;
 
 export type CategoryResponseIncluded =
   PromoteResponseIdentifiers<CategoryResponseRelInc>;
+
+export type CategoryRequestResource = RequestResource<
+  "item_categories",
+  CategoryAttributes
+>;

@@ -1,3 +1,12 @@
+import {
+  PromoteResponseIdentifiers,
+  RequestRelationship,
+  RequestResource,
+  ResponseIncludedFrom,
+  ResponseRelationship,
+  ResponseResource,
+} from "../../../../types";
+
 export type SalesInvoiceAttributes = {
   archived?: boolean;
   invoice_no?: string;
@@ -55,8 +64,59 @@ export type SalesInvoiceAttributes = {
   append_contact_balance?: boolean;
   e_document_accounts?: null[];
 };
+export type SalesInvoiceRequestAttributes = Omit<
+  SalesInvoiceAttributes,
+  | "archived"
+  | "net_total"
+  | "gross_total"
+  | "withholding"
+  | "total_excise_duty"
+  | "total_communications_tax"
+  | "total_vat"
+  | "total_vat_withholding"
+  | "total_discount"
+  | "total_invoice_discount"
+  | "before_taxes_total"
+  | "remaining"
+  | "remaining_in_trl"
+  | "payment_status"
+  | "created_at"
+  | "updated_at"
+>;
 
-// export type SalesInvoiceResponse = BaseResponse<
-//   SalesInvoiceAttributes,
-//   "sales_invoices"
-// >;
+export type SalesInvoiceRequestRels = {
+  category?: RequestRelationship<"item_categories">;
+  contact?: RequestRelationship<"contacts">;
+  details?: RequestRelationship<"sales_invoice_details", true>;
+  tags?: RequestRelationship<"tags", true>;
+  sales_offer?: RequestRelationship<"sales_offers">;
+};
+
+export type SalesInvoiceRequestResource = RequestResource<
+  "sales_invoices",
+  SalesInvoiceRequestAttributes,
+  SalesInvoiceRequestRels
+>;
+
+export type SalesInvoiceResponseRels = {
+  category?: ResponseRelationship<"item_categories">;
+  contact?: ResponseRelationship<"contacts">;
+  details?: ResponseRelationship<"sales_invoice_details", true>;
+  payments?: ResponseRelationship<"payments", true>;
+  tags?: ResponseRelationship<"tags", true>;
+  sharings?: ResponseRelationship<"sharings", true>;
+  recurrence_plan?: ResponseRelationship<"recurrence_plans">;
+  active_e_document?: ResponseRelationship<"e_archives" | "e_invoices">;
+};
+
+export type SalesInvoiceResponseResource = ResponseResource<
+  "sales_invoices",
+  SalesInvoiceAttributes,
+  SalesInvoiceResponseRels
+>;
+
+type SalesInvoiceResponseRelInc =
+  ResponseIncludedFrom<SalesInvoiceResponseResource>;
+
+export type SalesInvoiceResponseIncluded =
+  PromoteResponseIdentifiers<SalesInvoiceResponseRelInc>;

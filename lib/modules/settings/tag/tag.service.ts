@@ -1,7 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../../../common/parasut.logger";
+import { SingleRequest } from "../../../dto/request";
 import { ParasutHttpClient } from "../../../parasut.client";
-import { TagArrayResponse } from "./dto/response";
+import { TagArrayResponse, TagResponse } from "./dto/response";
+import { TagRequestResource } from "./dto/tag.attr";
 
 @Injectable()
 export class ParasutTagService {
@@ -19,7 +21,10 @@ export class ParasutTagService {
    *   - page: { number?: number, size?: number }
    * @returns A list of tags.
    */
-  async getTags(queryParams?: any): Promise<TagArrayResponse> {
+  async getTags(queryParams?: {
+    sort?: string;
+    page?: { number?: number; size?: number };
+  }): Promise<TagArrayResponse> {
     const params: any = {};
 
     if (queryParams) {
@@ -45,9 +50,14 @@ export class ParasutTagService {
    *                  typically { data: { type: "tags", attributes: { name: "tagName" } } }.
    * @returns The created tag.
    */
-  async createTag(payload: any): Promise<any> {
-    // Note: 'include' parameter is not shown in the API documentation for create tag.
-    return this.parasutClient.post<any, any, any>("/tags", {}, payload);
+  async createTag(
+    payload: SingleRequest<TagRequestResource>
+  ): Promise<TagResponse> {
+    return this.parasutClient.post<
+      TagResponse,
+      SingleRequest<TagRequestResource>,
+      Record<string, never>
+    >("/tags", {}, payload);
   }
 
   /**
@@ -55,9 +65,11 @@ export class ParasutTagService {
    * @param id - The ID of the tag.
    * @returns The tag.
    */
-  async getTagById(id: number): Promise<any> {
-    // Note: 'include' parameter is not shown in the API documentation for get tag by ID.
-    return this.parasutClient.get<any, any>(`/tags/${id}`, {});
+  async getTagById(id: number): Promise<TagResponse> {
+    return this.parasutClient.get<TagResponse, Record<string, never>>(
+      `/tags/${id}`,
+      {}
+    );
   }
 
   /**
@@ -67,9 +79,15 @@ export class ParasutTagService {
    *                  typically { data: { id: "tagId", type: "tags", attributes: { name: "newName" } } }.
    * @returns The updated tag.
    */
-  async updateTag(id: number, payload: any): Promise<any> {
-    // Note: 'include' parameter is not shown in the API documentation for update tag.
-    return this.parasutClient.put<any, any, any>(`/tags/${id}`, {}, payload);
+  async updateTag(
+    id: number,
+    payload: Partial<SingleRequest<TagRequestResource>>
+  ): Promise<TagResponse> {
+    return this.parasutClient.put<
+      TagResponse,
+      Partial<SingleRequest<TagRequestResource>>,
+      Record<string, never>
+    >(`/tags/${id}`, {}, payload);
   }
 
   /**
@@ -77,8 +95,7 @@ export class ParasutTagService {
    * @param id - The ID of the tag to delete.
    * @returns A promise that resolves when the tag is deleted (typically void or boolean).
    */
-  async deleteTag(id: number): Promise<any> {
-    // API returns 204 No Content.
-    return this.parasutClient.delete<any>(`/tags/${id}`);
+  async deleteTag(id: number): Promise<boolean> {
+    return this.parasutClient.delete(`/tags/${id}`);
   }
 }

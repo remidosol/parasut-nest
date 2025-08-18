@@ -25,6 +25,8 @@ export type EntityType =
   | "item_categories"
   | "e_archives"
   | "e_invoices"
+  | "e_smms"
+  | "e_invoice_inboxes"
   | "contact_portals"
   | "contact_people"
   | "employees"

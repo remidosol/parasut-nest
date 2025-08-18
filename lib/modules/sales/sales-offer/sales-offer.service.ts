@@ -1,6 +1,17 @@
 import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../../../common/parasut.logger";
 import { ParasutHttpClient } from "../../../parasut.client";
+import { RequestIncludeByType } from "../../../types";
+import {
+  CreateSalesOfferRequest,
+  UpdateSalesOfferRequest,
+} from "./dto/request";
+import {
+  CreateSalesOfferResponse,
+  GetSalesOfferResponse,
+  IndexSalesOfferResponse,
+  UpdateSalesOfferResponse,
+} from "./dto/response/response.dto";
 
 @Injectable()
 export class ParasutSalesOfferService {
@@ -20,7 +31,7 @@ export class ParasutSalesOfferService {
    *   - include: string (e.g., "contact,sales_invoice")
    * @returns A list of sales offers.
    */
-  async getSalesOffers(queryParams?: any): Promise<any> {
+  async getSalesOffers(queryParams?: any): Promise<IndexSalesOfferResponse> {
     const params: any = {};
     if (queryParams) {
       if (queryParams.filter) {
@@ -41,7 +52,10 @@ export class ParasutSalesOfferService {
       }
       if (queryParams.include) params.include = queryParams.include;
     }
-    return this.parasutClient.get<any, any>("/sales_offers", params);
+    return this.parasutClient.get<IndexSalesOfferResponse, any>(
+      "/sales_offers",
+      params
+    );
   }
 
   /**
@@ -50,14 +64,17 @@ export class ParasutSalesOfferService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The created sales offer.
    */
-  async createSalesOffer(payload: any, include?: string): Promise<any> {
+  async createSalesOffer(
+    payload: CreateSalesOfferRequest,
+    include?: RequestIncludeByType<"sales_offers">
+  ): Promise<CreateSalesOfferResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.post<any, any, any>(
-      "/sales_offers",
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.post<
+      CreateSalesOfferResponse,
+      CreateSalesOfferRequest,
+      { include?: string }
+    >("/sales_offers", params, payload);
   }
 
   /**
@@ -66,10 +83,16 @@ export class ParasutSalesOfferService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The sales offer.
    */
-  async getSalesOfferById(id: number, include?: string): Promise<any> {
+  async getSalesOfferById(
+    id: number,
+    include?: RequestIncludeByType<"sales_offers">
+  ): Promise<GetSalesOfferResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.get<any, any>(`/sales_offers/${id}`, params);
+    if (include) params.include = include.join(",");
+    return this.parasutClient.get<GetSalesOfferResponse, { include?: string }>(
+      `/sales_offers/${id}`,
+      params
+    );
   }
 
   /**
@@ -81,16 +104,16 @@ export class ParasutSalesOfferService {
    */
   async updateSalesOffer(
     id: number,
-    payload: any,
-    include?: string
-  ): Promise<any> {
+    payload: UpdateSalesOfferRequest,
+    include?: RequestIncludeByType<"sales_offers">
+  ): Promise<UpdateSalesOfferResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.put<any, any, any>(
-      `/sales_offers/${id}`,
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.put<
+      UpdateSalesOfferResponse,
+      UpdateSalesOfferRequest,
+      { include?: string }
+    >(`/sales_offers/${id}`, params, payload);
   }
 
   /**
@@ -98,8 +121,8 @@ export class ParasutSalesOfferService {
    * @param id - The ID of the sales offer to delete.
    * @returns A promise that resolves when the sales offer is deleted.
    */
-  async deleteSalesOffer(id: number): Promise<any> {
-    return this.parasutClient.delete<any>(`/sales_offers/${id}`);
+  async deleteSalesOffer(id: number): Promise<boolean> {
+    return this.parasutClient.delete(`/sales_offers/${id}`);
   }
 
   /**
@@ -111,10 +134,10 @@ export class ParasutSalesOfferService {
   async getSalesOfferPdf(id: number): Promise<any> {
     // The API endpoint is POST for PDF generation, possibly to start an async job.
     // No request body is shown in the image for this specific POST.
-    return this.parasutClient.post<any, any, any>(
+    return this.parasutClient.post<any, any, Record<string, never>>(
       `/sales_offers/${id}/pdf`,
       {},
-      {} // Assuming empty body if not specified
+      {}
     );
   }
 
@@ -123,9 +146,9 @@ export class ParasutSalesOfferService {
    * @param id - The ID of the sales offer to archive.
    * @returns The archived sales offer.
    */
-  async archiveSalesOffer(id: number): Promise<any> {
+  async archiveSalesOffer(id: number): Promise<GetSalesOfferResponse> {
     // No request body or query params shown in the image for archive.
-    return this.parasutClient.patch<any, any>(
+    return this.parasutClient.patch<GetSalesOfferResponse, undefined>(
       `/sales_offers/${id}/archive`,
       {}
     );
@@ -136,9 +159,9 @@ export class ParasutSalesOfferService {
    * @param id - The ID of the sales offer to unarchive.
    * @returns The unarchived sales offer.
    */
-  async unarchiveSalesOffer(id: number): Promise<any> {
+  async unarchiveSalesOffer(id: number): Promise<GetSalesOfferResponse> {
     // No request body or query params shown in the image for unarchive.
-    return this.parasutClient.patch<any, any>(
+    return this.parasutClient.patch<GetSalesOfferResponse, undefined>(
       `/sales_offers/${id}/unarchive`,
       {}
     );

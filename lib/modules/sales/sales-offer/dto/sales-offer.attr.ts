@@ -1,3 +1,12 @@
+import {
+  PromoteResponseIdentifiers,
+  RequestRelationship,
+  RequestResource,
+  ResponseIncludedFrom,
+  ResponseRelationship,
+  ResponseResource,
+} from "../../../../types";
+
 export type SalesOfferAttributes = {
   content?: string;
   contact_type?: string;
@@ -35,9 +44,43 @@ export type SalesOfferAttributes = {
   order_no?: string;
   order_date?: Date;
 };
+export type SalesOfferRequestAttributes = Omit<
+  SalesOfferAttributes,
+  | "net_total"
+  | "gross_total"
+  | "withholding"
+  | "total_excise_duty"
+  | "total_communications_tax"
+  | "total_accommodation_tax"
+  | "total_vat"
+  | "total_vat_withholding"
+  | "vat_withholding"
+>;
 
-// export type SalesOfferResponse<isArray extends boolean = false> = BaseResponse<
-//   SalesOfferAttributes,
-//   "sales_offers",
-//   isArray
-// >;
+export type SalesOfferRequestRels = {
+  contact?: RequestRelationship<"contacts">;
+  details?: RequestRelationship<"sales_offer_details", true>;
+};
+
+export type SalesOfferRequestResource = RequestResource<
+  "sales_offers",
+  SalesOfferRequestAttributes,
+  SalesOfferRequestRels
+>;
+
+export type SalesOfferResponseRels = {
+  contact?: ResponseRelationship<"contacts">;
+  sales_invoice?: ResponseRelationship<"sales_invoices">;
+};
+
+export type SalesOfferResponseResource = ResponseResource<
+  "sales_offers",
+  SalesOfferAttributes,
+  SalesOfferResponseRels
+>;
+
+type SalesOfferResponseRelInc =
+  ResponseIncludedFrom<SalesOfferResponseResource>;
+
+export type SalesOfferResponseIncluded =
+  PromoteResponseIdentifiers<SalesOfferResponseRelInc>;

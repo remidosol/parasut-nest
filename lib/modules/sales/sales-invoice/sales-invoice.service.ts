@@ -1,6 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../../../common/parasut.logger";
 import { ParasutHttpClient } from "../../../parasut.client";
+import { RequestIncludeByType } from "../../../types";
+import {
+  CreateSalesInvoiceRequest,
+  UpdateSalesInvoiceRequest,
+} from "./dto/request";
+import { PaySalesInvoiceResponse } from "./dto/response/payment-response.dto";
+import {
+  CreateSalesInvoiceResponse,
+  GetSalesInvoiceResponse,
+  IndexSalesInvoiceResponse,
+  UpdateSalesInvoiceResponse,
+} from "./dto/response/response.dto";
 
 @Injectable()
 export class ParasutSalesInvoiceService {
@@ -20,7 +32,9 @@ export class ParasutSalesInvoiceService {
    *   - include: string (e.g., "category,contact,details,details.product,details.warehouse,payments,payments.transaction,tags,sharings,recurrence_plan,active_e_document")
    * @returns A list of sales invoices.
    */
-  async getSalesInvoices(queryParams?: any): Promise<any> {
+  async getSalesInvoices(
+    queryParams?: any
+  ): Promise<IndexSalesInvoiceResponse> {
     const params: any = {};
     if (queryParams) {
       if (queryParams.filter) {
@@ -49,7 +63,10 @@ export class ParasutSalesInvoiceService {
       }
       if (queryParams.include) params.include = queryParams.include;
     }
-    return this.parasutClient.get<any, any>("/sales_invoices", params);
+    return this.parasutClient.get<IndexSalesInvoiceResponse, any>(
+      "/sales_invoices",
+      params
+    );
   }
 
   /**
@@ -58,14 +75,17 @@ export class ParasutSalesInvoiceService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The created sales invoice.
    */
-  async createSalesInvoice(payload: any, include?: string): Promise<any> {
+  async createSalesInvoice(
+    payload: CreateSalesInvoiceRequest,
+    include?: RequestIncludeByType<"sales_invoices">
+  ): Promise<CreateSalesInvoiceResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.post<any, any, any>(
-      "/sales_invoices",
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.post<
+      CreateSalesInvoiceResponse,
+      CreateSalesInvoiceRequest,
+      { include?: string }
+    >("/sales_invoices", params, payload);
   }
 
   /**
@@ -74,10 +94,16 @@ export class ParasutSalesInvoiceService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The sales invoice.
    */
-  async getSalesInvoiceById(id: number, include?: string): Promise<any> {
+  async getSalesInvoiceById(
+    id: number,
+    include?: RequestIncludeByType<"sales_invoices">
+  ): Promise<GetSalesInvoiceResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.get<any, any>(`/sales_invoices/${id}`, params);
+    if (include) params.include = include.join(",");
+    return this.parasutClient.get<
+      GetSalesInvoiceResponse,
+      { include?: string }
+    >(`/sales_invoices/${id}`, params);
   }
 
   /**
@@ -89,16 +115,16 @@ export class ParasutSalesInvoiceService {
    */
   async updateSalesInvoice(
     id: number,
-    payload: any,
-    include?: string
-  ): Promise<any> {
+    payload: UpdateSalesInvoiceRequest,
+    include?: RequestIncludeByType<"sales_invoices">
+  ): Promise<UpdateSalesInvoiceResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.put<any, any, any>(
-      `/sales_invoices/${id}`,
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.put<
+      UpdateSalesInvoiceResponse,
+      UpdateSalesInvoiceRequest,
+      { include?: string }
+    >(`/sales_invoices/${id}`, params, payload);
   }
 
   /**
@@ -106,8 +132,8 @@ export class ParasutSalesInvoiceService {
    * @param id - The ID of the sales invoice to delete.
    * @returns A promise that resolves when the sales invoice is deleted.
    */
-  async deleteSalesInvoice(id: number): Promise<any> {
-    return this.parasutClient.delete<any>(`/sales_invoices/${id}`);
+  async deleteSalesInvoice(id: number): Promise<boolean> {
+    return this.parasutClient.delete(`/sales_invoices/${id}`);
   }
 
   /**
@@ -120,15 +146,15 @@ export class ParasutSalesInvoiceService {
   async paySalesInvoice(
     id: number,
     payload: any,
-    include?: string
-  ): Promise<any> {
+    include?: RequestIncludeByType<"sales_invoices">
+  ): Promise<PaySalesInvoiceResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.post<any, any, any>(
-      `/sales_invoices/${id}/payments`,
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.post<
+      PaySalesInvoiceResponse,
+      any,
+      { include?: string }
+    >(`/sales_invoices/${id}/payments`, params, payload);
   }
 
   /**
@@ -137,13 +163,13 @@ export class ParasutSalesInvoiceService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The response from the cancel operation.
    */
-  async cancelSalesInvoice(id: number, include?: string): Promise<any> {
+  async cancelSalesInvoice(
+    id: number,
+    include?: RequestIncludeByType<"sales_invoices">
+  ): Promise<boolean> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.delete<any>(
-      `/sales_invoices/${id}/cancel`,
-      params
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.delete(`/sales_invoices/${id}/cancel`, params);
   }
 
   /**
@@ -152,13 +178,17 @@ export class ParasutSalesInvoiceService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The recovered sales invoice.
    */
-  async recoverSalesInvoice(id: number, include?: string): Promise<any> {
+  async recoverSalesInvoice(
+    id: number,
+    include?: RequestIncludeByType<"sales_invoices">
+  ): Promise<GetSalesInvoiceResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.patch<any, any>(
-      `/sales_invoices/${id}/recover`,
-      params
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.patch<
+      GetSalesInvoiceResponse,
+      undefined,
+      { include?: string }
+    >(`/sales_invoices/${id}/recover`, params);
   }
 
   /**
@@ -167,13 +197,17 @@ export class ParasutSalesInvoiceService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The archived sales invoice.
    */
-  async archiveSalesInvoice(id: number, include?: string): Promise<any> {
+  async archiveSalesInvoice(
+    id: number,
+    include?: RequestIncludeByType<"sales_invoices">
+  ): Promise<GetSalesInvoiceResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.patch<any, any>(
-      `/sales_invoices/${id}/archive`,
-      params
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.patch<
+      GetSalesInvoiceResponse,
+      undefined,
+      { include?: string }
+    >(`/sales_invoices/${id}/archive`, params);
   }
 
   /**
@@ -182,13 +216,17 @@ export class ParasutSalesInvoiceService {
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The unarchived sales invoice.
    */
-  async unarchiveSalesInvoice(id: number, include?: string): Promise<any> {
+  async unarchiveSalesInvoice(
+    id: number,
+    include?: RequestIncludeByType<"sales_invoices">
+  ): Promise<GetSalesInvoiceResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    return this.parasutClient.patch<any, any>(
-      `/sales_invoices/${id}/unarchive`,
-      params
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.patch<
+      GetSalesInvoiceResponse,
+      undefined,
+      { include?: string }
+    >(`/sales_invoices/${id}/unarchive`, params);
   }
 
   /**
@@ -201,16 +239,15 @@ export class ParasutSalesInvoiceService {
    */
   async convertEstimateToInvoice(
     id: number,
-    payload: any, // Payload might be required based on API specifics for conversion
-    include?: string
-  ): Promise<any> {
+    payload: any,
+    include?: RequestIncludeByType<"sales_invoices">
+  ): Promise<GetSalesInvoiceResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    // The image shows a PATCH request with a body for "convert_to_invoice"
-    return this.parasutClient.patch<any, any, any>(
-      `/sales_invoices/${id}/convert_to_invoice`,
-      params,
-      payload
-    );
+    if (include) params.include = include.join(",");
+    return this.parasutClient.patch<
+      GetSalesInvoiceResponse,
+      any,
+      { include?: string }
+    >(`/sales_invoices/${id}/convert_to_invoice`, params, payload);
   }
 }

@@ -1,5 +1,6 @@
 import {
   PromoteResponseIdentifiers,
+  RequestResource,
   ResponseIncludedFrom,
   ResponseResource,
 } from "../../../../types";
@@ -21,3 +22,8 @@ export type TagResponseResource = ResponseResource<
 type TagResponseRelInc = ResponseIncludedFrom<TagResponseResource>;
 
 export type TagResponseIncluded = PromoteResponseIdentifiers<TagResponseRelInc>;
+
+export type TagRequestResource = RequestResource<
+  "tags",
+  Pick<TagAttributes, "name">
+>;
