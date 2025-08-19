@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>1.1.1 (2025-08-19)</small>
+
+* Update LICENSE ([4f2a0ef](https://github.com/remidosol/parasut-nest/commit/4f2a0ef))
+
 ## 1.1.0 (2025-08-19)
 
 * chore: add GitHub Actions workflows for release management ([1ea7b89](https://github.com/remidosol/parasut-nest/commit/1ea7b89))
