@@ -1,6 +1,15 @@
 const { execSync } = require("child_process");
 
 try {
+  const isCi = process.env.CI === "true" || !!process.env.GITHUB_ACTIONS;
+  const githubRef = process.env.GITHUB_REF || "";
+  const isTagRef = githubRef.startsWith("refs/tags/");
+
+  // Allow running on CI when the workflow is triggered by a tag push
+  if (isCi && isTagRef) {
+    process.exit(0);
+  }
+
   const currentBranch = execSync("git rev-parse --abbrev-ref HEAD")
     .toString()
     .trim();
