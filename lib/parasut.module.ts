@@ -41,9 +41,12 @@ export class ParasutModule {
         provide: CircuitBreaker,
         useFactory: (
           logger: ParasutLoggerService,
-          bexOptions: ParasutModuleOptions
+          parasutOptions: ParasutModuleOptions
         ) => {
-          return new CircuitBreaker(logger, bexOptions.circuitBreakerOptions);
+          return new CircuitBreaker(
+            logger,
+            parasutOptions.circuitBreakerOptions
+          );
         },
         inject: [ParasutLoggerService, PARASUT_MODULE_OPTIONS],
       };
@@ -123,7 +126,20 @@ export class ParasutModule {
         ...(performanceServiceProvider ? [performanceServiceProvider] : []),
         ParasutHttpClient,
       ],
-      exports: [],
+      exports: [
+        ParasutHttpClient,
+        ParasutLoggerService,
+        ParasutConfig,
+        ParasutContactModule,
+        ParasutBankFeeModule,
+        ParasutEmployeeModule,
+        ParasutPurchaseBillModule,
+        ParasutSalaryModule,
+        ParasutTaxModule,
+        ParasutFormalizationModule,
+        ParasutSalesOfferModule,
+        ParasutSalesInvoiceModule,
+      ],
       global: options.global ?? false,
     };
   }
@@ -133,8 +149,8 @@ export class ParasutModule {
 
     const loggerProvider: Provider = {
       provide: ParasutLoggerService,
-      useFactory: (bexOptions: ParasutModuleOptions) => {
-        return new ParasutLoggerService(bexOptions.logger ?? new Logger());
+      useFactory: (parasutOptions: ParasutModuleOptions) => {
+        return new ParasutLoggerService(parasutOptions.logger ?? new Logger());
       },
       inject: [PARASUT_MODULE_OPTIONS],
     };
@@ -143,10 +159,13 @@ export class ParasutModule {
       provide: CircuitBreaker,
       useFactory: (
         logger: ParasutLoggerService,
-        bexOptions: ParasutModuleOptions
+        parasutOptions: ParasutModuleOptions
       ) => {
-        if (bexOptions.circuitBreakerOptions?.enabled) {
-          return new CircuitBreaker(logger, bexOptions.circuitBreakerOptions);
+        if (parasutOptions.circuitBreakerOptions?.enabled) {
+          return new CircuitBreaker(
+            logger,
+            parasutOptions.circuitBreakerOptions
+          );
         }
 
         return null;
@@ -158,18 +177,51 @@ export class ParasutModule {
       provide: PerformanceService,
       useFactory: (
         logger: ParasutLoggerService,
-        bexOptions: ParasutModuleOptions
+        parasutOptions: ParasutModuleOptions
       ) => {
-        if (bexOptions.performanceMetricOptions?.enabled) {
+        if (parasutOptions.performanceMetricOptions?.enabled) {
           return new PerformanceService(
             logger,
-            bexOptions.performanceMetricOptions
+            parasutOptions.performanceMetricOptions
           );
         }
 
         return null;
       },
       inject: [ParasutLoggerService, PARASUT_MODULE_OPTIONS],
+    };
+
+    const configProvider: Provider = {
+      provide: ParasutConfig,
+      useFactory: (parasutOptions: ParasutModuleOptions) => {
+        return new ParasutConfig({
+          parasutEnv: parasutOptions.credentials.environment,
+          parasutClientId: parasutOptions.credentials.clientId,
+          redirectUri: parasutOptions.credentials.redirectUri,
+          parasutSecret: parasutOptions.credentials.clientSecret,
+          parasutCompanyId: parasutOptions.credentials.companyId,
+          parasutEmail: parasutOptions.credentials.email,
+          parasutPassword: parasutOptions.credentials.password,
+          timeout: parasutOptions.timeout,
+        });
+      },
+      inject: [PARASUT_MODULE_OPTIONS],
+    };
+
+    const httpClientProvider: Provider = {
+      provide: ParasutHttpClient,
+      useFactory: (
+        config: ParasutConfig,
+        logger: ParasutLoggerService,
+        circuitBreaker: CircuitBreaker | null
+      ) => {
+        return new ParasutHttpClient(
+          config,
+          logger,
+          circuitBreaker || undefined
+        );
+      },
+      inject: [ParasutConfig, ParasutLoggerService, CircuitBreaker],
     };
 
     return {
@@ -191,9 +243,23 @@ export class ParasutModule {
         loggerProvider,
         circuitBreakerProvider,
         performanceServiceProvider,
-        ParasutHttpClient,
+        configProvider,
+        httpClientProvider,
       ],
-      exports: [],
+      exports: [
+        ParasutHttpClient,
+        ParasutLoggerService,
+        ParasutConfig,
+        ParasutContactModule,
+        ParasutBankFeeModule,
+        ParasutEmployeeModule,
+        ParasutPurchaseBillModule,
+        ParasutSalaryModule,
+        ParasutTaxModule,
+        ParasutFormalizationModule,
+        ParasutSalesOfferModule,
+        ParasutSalesInvoiceModule,
+      ],
     };
   }
 }
