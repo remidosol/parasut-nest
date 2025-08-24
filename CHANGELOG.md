@@ -1,5 +1,10 @@
 # Changelog
 
+## <small>1.1.2 (2025-08-24)</small>
+
+* chore: remove test scripts from package.json ([1557b4b](https://github.com/remidosol/parasut-nest/commit/1557b4b))
+* fix: testing scripts and enhance ParasutModule exports ([95b3068](https://github.com/remidosol/parasut-nest/commit/95b3068))
+
 ## <small>1.1.1 (2025-08-19)</small>
 
 * Update LICENSE ([4f2a0ef](https://github.com/remidosol/parasut-nest/commit/4f2a0ef))
