@@ -124,13 +124,26 @@ export class AppModule {}
 The `ParasutModule` is the main NestJS module that orchestrates the integration with the Parasut API. It offers both synchronous (`forRoot`) and asynchronous (`forRootAsync`) registration methods to provide flexible configuration options.
 
 * **`forRoot(options: ParasutModuleOptions)`**:
-  * Registers `ParasutLoggerService`, `CircuitBreaker`, `PerformanceService`, `ParasutConfig`, and `ParasutHttpClient` as providers.
+  * Imports `ParasutCoreModule.forRoot()` to provide core services (`ParasutLoggerService`, `CircuitBreaker`, `PerformanceService`, `ParasutConfig`, and `ParasutHttpClient`).
   * Imports and makes available various feature modules (e.g., `ParasutContactModule`, `ParasutBankFeeModule`, etc.).
   * Allows enabling/disabling `CircuitBreaker` and `PerformanceService` based on provided options.
 * **`forRootAsync(options: ParasutModuleAsyncOptions)`**:
+  * Imports `ParasutCoreModule.forRootAsync()` to provide core services asynchronously.
   * Enables asynchronous configuration of the module, supporting `useFactory`, `useClass`, or `useExisting` patterns for dynamic options loading.
 
-### 3.2. ParasutHttpClient
+### 3.2. ParasutCoreModule
+
+The `ParasutCoreModule` is a shared module that provides all the core services required by the Parasut integration. It's designed to be imported by both the main module and individual feature modules.
+
+* **`forRoot(options: ParasutModuleOptions)`**:
+  * Provides core services: `ParasutLoggerService`, `ParasutConfig`, `ParasutHttpClient`, and optionally `CircuitBreaker` and `PerformanceService`.
+  * Registers all providers with proper dependency injection.
+  * Exports all core services for use by feature modules.
+* **`forRootAsync(options: ParasutModuleAsyncOptions)`**:
+  * Provides the same core services asynchronously.
+  * Supports dynamic configuration loading through various patterns.
+
+### 3.3. ParasutHttpClient
 
 The `ParasutHttpClient` is the central service for making HTTP requests to the Parasut API. It is built on top of `axios` and includes:
 
@@ -140,7 +153,7 @@ The `ParasutHttpClient` is the central service for making HTTP requests to the P
 * **Circuit Breaker Integration**: Optionally integrates with `CircuitBreaker` to apply resilience patterns to API calls.
 * **Generic HTTP Methods**: Provides wrapper methods for `GET`, `POST`, `PUT`, `PATCH`, and `DELETE` requests, handling authentication and error propagation.
 
-### 3.3. ParasutConfig
+### 3.4. ParasutConfig
 
 The `ParasutConfig` class holds all the necessary configuration settings for interacting with the Parasut API. These settings include:
 
@@ -155,7 +168,7 @@ The `ParasutConfig` class holds all the necessary configuration settings for int
 
 It utilizes `class-validator` to ensure that the provided configuration values are valid.
 
-### 3.4. Module Options and Providers
+### 3.5. Module Options and Providers
 
 The package provides interfaces and helper functions for configuring `ParasutModule` asynchronously:
 
@@ -165,7 +178,7 @@ The package provides interfaces and helper functions for configuring `ParasutMod
 * **`ParasutModuleAsyncOptions`**: Extends `ModuleMetadata` and defines options for asynchronous module registration, supporting `useExisting`, `useClass`, and `useFactory` patterns.
 * **`createAsyncOptionsProvider` / `createAsyncProviders`**: Helper functions to set up asynchronous providers for the module's options and configuration.
 
-### 3.5. Enums and Constants
+### 3.6. Enums and Constants
 
 * **`ParasutEnvironment`**: An enum defining the available environments for the Parasut API (`DEV`, `PRODUCTION`).
 * **`GrantType`**: An enum defining OAuth2.0 grant types (`AUTHORIZATION_CODE`, `PASSWORD`, `REFRESH_TOKEN`).
@@ -246,6 +259,54 @@ Found under `lib/types/`:
 ## 6. Modules
 
 The `parasut-nest` package is organized into several modules, each responsible for interacting with a specific part of the Parasut API.
+
+### 6.0. Module Usage Patterns
+
+The package supports two main usage patterns:
+
+**Pattern 1: Import the main module (recommended for most use cases)**
+```typescript
+import { ParasutModule } from '@remidosol/parasut-nest';
+
+@Module({
+  imports: [
+    ParasutModule.forRoot({
+      credentials: { /* your credentials */ },
+      // ... other options
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+**Pattern 2: Import individual feature modules (for selective usage)**
+```typescript
+import { ParasutContactModule } from '@remidosol/parasut-nest';
+
+@Module({
+  imports: [
+    ParasutContactModule, // This works because it imports ParasutCoreModule
+  ],
+})
+export class AppModule {}
+```
+
+**Pattern 3: Import the core module directly (for advanced use cases)**
+```typescript
+import { ParasutCoreModule } from '@remidosol/parasut-nest';
+
+@Module({
+  imports: [
+    ParasutCoreModule.forRoot({
+      credentials: { /* your credentials */ },
+      // ... other options
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+**Note**: All feature modules now import `ParasutCoreModule` internally, ensuring they have access to the required core services (`ParasutHttpClient`, `ParasutLoggerService`, etc.). This resolves the previous dependency injection issues.
 
 ### 6.1. Contact Module
 
