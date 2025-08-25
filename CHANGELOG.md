@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0 (2025-08-25)
+
+* feat: introduce ParasutCoreModule for enhanced modularity ([ec791eb](https://github.com/remidosol/parasut-nest/commit/ec791eb))
+
 ## <small>1.1.2 (2025-08-24)</small>
 
 * chore: remove test scripts from package.json ([1557b4b](https://github.com/remidosol/parasut-nest/commit/1557b4b))
