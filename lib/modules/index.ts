@@ -1,3 +1,4 @@
+export * from "../parasut-core.module";
 export * from "./contact/contact.module";
 export * from "./contact/contact.service";
 export * from "./expenses";

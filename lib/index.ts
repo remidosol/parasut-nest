@@ -3,6 +3,7 @@ export * from "./parasut.client";
 export * from "./parasut.constants";
 export * from "./parasut.enum";
 export * from "./parasut.module";
+export * from "./parasut-core.module";
 
 // Configuration
 export * from "./config/parasut.config";
