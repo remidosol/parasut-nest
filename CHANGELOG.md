@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>1.2.1 (2025-08-30)</small>
+
+* refactor: enhance conditional injection in ParasutCoreModule ([a0c6c2f](https://github.com/remidosol/parasut-nest/commit/a0c6c2f))
+
 ## 1.2.0 (2025-08-25)
 
 * feat: introduce ParasutCoreModule for enhanced modularity ([ec791eb](https://github.com/remidosol/parasut-nest/commit/ec791eb))
