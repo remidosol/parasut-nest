@@ -120,7 +120,8 @@ export class ParasutCoreModule {
       inject: [PARASUT_MODULE_OPTIONS],
     };
 
-    const circuitBreakerFactory = {
+    // Create conditional providers that only provide services when enabled
+    const circuitBreakerProvider: Provider = {
       provide: CircuitBreaker,
       useFactory: (
         logger: ParasutLoggerService,
@@ -132,12 +133,13 @@ export class ParasutCoreModule {
             parasutOptions.circuitBreakerOptions
           );
         }
-        return null;
+        // Return undefined when disabled - this will be handled by ParasutHttpClient
+        return undefined;
       },
       inject: [ParasutLoggerService, PARASUT_MODULE_OPTIONS],
     };
 
-    const performanceServiceFactory = {
+    const performanceServiceProvider: Provider = {
       provide: PerformanceService,
       useFactory: (
         logger: ParasutLoggerService,
@@ -149,7 +151,8 @@ export class ParasutCoreModule {
             parasutOptions.performanceMetricOptions
           );
         }
-        return null;
+        // Return undefined when disabled
+        return undefined;
       },
       inject: [ParasutLoggerService, PARASUT_MODULE_OPTIONS],
     };
@@ -180,20 +183,17 @@ export class ParasutCoreModule {
       ) => {
         return new ParasutHttpClient(config, logger, circuitBreaker);
       },
-      inject: [
-        ParasutConfig,
-        ParasutLoggerService,
-        ...(circuitBreakerFactory ? [CircuitBreaker] : []),
-      ],
+      inject: [ParasutConfig, ParasutLoggerService, CircuitBreaker],
     };
 
     return {
       module: ParasutCoreModule,
+      imports: options.imports,
       providers: [
         ...asyncProviders,
         loggerProvider,
-        ...(circuitBreakerFactory ? [circuitBreakerFactory] : []),
-        ...(performanceServiceFactory ? [performanceServiceFactory] : []),
+        circuitBreakerProvider,
+        performanceServiceProvider,
         configProvider,
         httpClientProvider,
       ],
