@@ -180,7 +180,11 @@ export class ParasutCoreModule {
       ) => {
         return new ParasutHttpClient(config, logger, circuitBreaker);
       },
-      inject: [ParasutConfig, ParasutLoggerService, CircuitBreaker],
+      inject: [
+        ParasutConfig,
+        ParasutLoggerService,
+        ...(circuitBreakerFactory ? [CircuitBreaker] : []),
+      ],
     };
 
     return {
@@ -188,8 +192,8 @@ export class ParasutCoreModule {
       providers: [
         ...asyncProviders,
         loggerProvider,
-        circuitBreakerFactory,
-        performanceServiceFactory,
+        ...(circuitBreakerFactory ? [circuitBreakerFactory] : []),
+        ...(performanceServiceFactory ? [performanceServiceFactory] : []),
         configProvider,
         httpClientProvider,
       ],
