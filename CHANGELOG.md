@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>1.2.3 (2025-08-30)</small>
+
+* chore: update package dependencies in package.json and package-lock.json ([62e5876](https://github.com/remidosol/parasut-nest/commit/62e5876))
+
 ## <small>1.2.2 (2025-08-30)</small>
 
 * refactor: improve service provider definitions in ParasutCoreModule ([c6eef9e](https://github.com/remidosol/parasut-nest/commit/c6eef9e))
