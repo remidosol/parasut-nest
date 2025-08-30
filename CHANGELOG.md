@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>1.2.2 (2025-08-30)</small>
+
+* refactor: improve service provider definitions in ParasutCoreModule ([c6eef9e](https://github.com/remidosol/parasut-nest/commit/c6eef9e))
+
 ## <small>1.2.1 (2025-08-30)</small>
 
 * refactor: enhance conditional injection in ParasutCoreModule ([a0c6c2f](https://github.com/remidosol/parasut-nest/commit/a0c6c2f))
