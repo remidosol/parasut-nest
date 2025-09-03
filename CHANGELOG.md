@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>1.2.4 (2025-09-03)</small>
+
+* refactor: integrate environment validation in ParasutConfig usage ([6122da8](https://github.com/remidosol/parasut-nest/commit/6122da8))
+
 ## <small>1.2.3 (2025-08-30)</small>
 
 * chore: update package dependencies in package.json and package-lock.json ([62e5876](https://github.com/remidosol/parasut-nest/commit/62e5876))
