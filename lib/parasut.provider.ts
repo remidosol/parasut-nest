@@ -1,6 +1,6 @@
 import { Provider, Type } from "@nestjs/common";
 import { ParasutLoggerService } from "./common/parasut.logger";
-import { ParasutConfig } from "./config/parasut.config";
+import { ParasutConfig, validateEnvs } from "./config/parasut.config";
 import {
   ParasutModuleAsyncOptions,
   ParasutModuleOptions,
@@ -78,7 +78,7 @@ export const createAsyncProviders = (
         inject: [PARASUT_MODULE_OPTIONS],
         provide: ParasutConfig,
         useFactory: (options: ParasutModuleOptions) => {
-          return new ParasutConfig({
+          return validateEnvs({
             parasutEnv: options.credentials.environment,
             parasutClientId: options.credentials.clientId,
             redirectUri: options.credentials.redirectUri,

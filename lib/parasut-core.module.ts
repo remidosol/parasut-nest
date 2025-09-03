@@ -2,7 +2,7 @@ import { DynamicModule, Logger, Module, Provider } from "@nestjs/common";
 import { CircuitBreaker } from "./common/circuit-breaker";
 import { ParasutLoggerService } from "./common/parasut.logger";
 import { PerformanceService } from "./common/performance-metric";
-import { ParasutConfig } from "./config/parasut.config";
+import { ParasutConfig, validateEnvs } from "./config/parasut.config";
 import {
   ParasutModuleAsyncOptions,
   ParasutModuleOptions,
@@ -60,7 +60,7 @@ export class ParasutCoreModule {
 
     const configProvider: Provider = {
       provide: ParasutConfig,
-      useValue: new ParasutConfig({
+      useValue: validateEnvs({
         parasutEnv: options.credentials.environment,
         parasutClientId: options.credentials.clientId,
         redirectUri: options.credentials.redirectUri,
@@ -160,7 +160,7 @@ export class ParasutCoreModule {
     const configProvider: Provider = {
       provide: ParasutConfig,
       useFactory: (parasutOptions: ParasutModuleOptions) => {
-        return new ParasutConfig({
+        return validateEnvs({
           parasutEnv: parasutOptions.credentials.environment,
           parasutClientId: parasutOptions.credentials.clientId,
           redirectUri: parasutOptions.credentials.redirectUri,

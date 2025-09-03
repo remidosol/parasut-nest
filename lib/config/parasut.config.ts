@@ -44,28 +44,6 @@ export class ParasutConfig {
   @IsNumber()
   @IsOptional()
   timeout?: number;
-
-  constructor(envs: {
-    parasutClientId: string;
-    parasutSecret: string;
-    redirectUri: string;
-    parasutCompanyId: string;
-    parasutEmail: string;
-    parasutPassword: string;
-    parasutEnv: ParasutEnvironment;
-    timeout?: number;
-  }) {
-    validateEnvs(envs);
-
-    this.parasutClientId = envs.parasutClientId;
-    this.parasutSecret = envs.parasutSecret;
-    this.redirectUri = envs.redirectUri;
-    this.parasutCompanyId = envs.parasutCompanyId;
-    this.parasutEmail = envs.parasutEmail;
-    this.parasutPassword = envs.parasutPassword;
-    this.parasutEnv = envs.parasutEnv;
-    this.timeout = envs.timeout;
-  }
 }
 
 export function validateEnvs(envs: Record<string, unknown>) {
