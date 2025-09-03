@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0 (2025-09-03)
+
+* feat: add module exports to index for improved organization ([4ba1a9f](https://github.com/remidosol/parasut-nest/commit/4ba1a9f))
+
 ## <small>1.2.4 (2025-09-03)</small>
 
 * refactor: integrate environment validation in ParasutConfig usage ([6122da8](https://github.com/remidosol/parasut-nest/commit/6122da8))
