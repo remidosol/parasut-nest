@@ -15,3 +15,6 @@ export * from "./dto/response";
 
 // Exceptions
 export * from "./common/exceptions";
+
+// Modules
+export * from "./modules";
