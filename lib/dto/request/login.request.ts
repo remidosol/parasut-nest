@@ -9,28 +9,28 @@ import {
 import { GrantType } from "../../parasut.enum";
 
 export class ParasutAuthDto {
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Grant type is required" })
   @IsEnum(GrantType)
   grant_type!: GrantType;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Client id is required" })
+  @IsString({ message: "Invalid client id" })
   client_id!: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Client secret is required" })
+  @IsString({ message: "Invalid client secret" })
   client_secret!: string;
 
   @ValidateIf((o: ParasutAuthDto) => o.grant_type === GrantType.PASSWORD)
-  @IsEmail()
+  @IsEmail(undefined, { message: "Invalid username" })
   username?: string;
 
   @ValidateIf((o: ParasutAuthDto) => o.grant_type === GrantType.PASSWORD)
-  @IsString()
+  @IsString({ message: "Invalid password" })
   password?: string;
 
   @ValidateIf((o: ParasutAuthDto) => o.grant_type === GrantType.REFRESH_TOKEN)
-  @IsString()
+  @IsString({ message: "Invalid refresh token" })
   refresh_token?: string;
 
   @ValidateIf(

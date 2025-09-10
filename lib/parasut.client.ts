@@ -1,6 +1,7 @@
 import { Injectable, Optional } from "@nestjs/common";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { validate } from "class-validator";
+import { URLSearchParams } from "url";
 import { CircuitBreaker } from "./common/circuit-breaker/circuit-breaker.service";
 import { ParasutLoggerService } from "./common/parasut.logger";
 import { ParasutConfig } from "./config/parasut.config";
@@ -75,14 +76,52 @@ export class ParasutHttpClient {
         throw new Error("Validation failed");
       }
 
-      const response = await axios.post<AuthResponse>(
-        "https://api.parasut.com/oauth/token",
-        reqDto
-      );
+      let accessToken = "";
+      let refreshToken = "";
+      let tokenExpiresAt = 0;
 
-      this.accessToken = response.data.access_token;
-      this.refreshToken = response.data.refresh_token;
-      this.tokenExpiresAt = Date.now() + (response.data.expires_in - 60) * 1000;
+      switch (reqDto.grant_type) {
+        case GrantType.AUTHORIZATION_CODE: {
+          throw new Error("Authorization code grant type is not supported");
+        }
+        case GrantType.PASSWORD: {
+          const params = new URLSearchParams();
+
+          if (!reqDto.username) {
+            throw new Error("Username is required");
+          }
+          if (!reqDto.password) {
+            throw new Error("Password is required");
+          }
+
+          params.append("client_id", reqDto.client_id);
+          params.append("client_secret", reqDto.client_secret);
+          params.append("redirect_uri", "urn:ietf:wg:oauth:2.0:oob");
+          params.append("username", reqDto.username);
+          params.append("password", reqDto.password);
+          params.append("grant_type", reqDto.grant_type);
+
+          const response = await axios.post<AuthResponse>(
+            "https://api.parasut.com/oauth/token",
+            undefined,
+            {
+              params,
+            }
+          );
+
+          accessToken = response.data.access_token;
+          refreshToken = response.data.refresh_token;
+          tokenExpiresAt = Date.now() + (response.data.expires_in - 60) * 1000;
+          break;
+        }
+        default: {
+          throw new Error("Invalid grant type");
+        }
+      }
+
+      this.accessToken = accessToken;
+      this.refreshToken = refreshToken;
+      this.tokenExpiresAt = tokenExpiresAt;
     } catch (err: any) {
       this.logger.error("Authentication failed", err);
       throw new Error("Authentication failed");
