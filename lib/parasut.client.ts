@@ -149,10 +149,26 @@ export class ParasutHttpClient {
         this.logger.error("Validation failed", validatedDto);
         throw new Error("Validation failed");
       }
+      const params = new URLSearchParams();
+
+      if (!reqDto.refresh_token) {
+        throw new Error("Refresh token is required");
+      }
+      if (!reqDto.grant_type || reqDto.grant_type !== GrantType.REFRESH_TOKEN) {
+        throw new Error("Invalid grant type");
+      }
+
+      params.append("client_id", reqDto.client_id);
+      params.append("client_secret", reqDto.client_secret);
+      params.append("refresh_token", reqDto.refresh_token);
+      params.append("grant_type", reqDto.grant_type);
 
       const response = await axios.post<AuthResponse>(
         "https://api.parasut.com/oauth/token",
-        reqDto
+        undefined,
+        {
+          params,
+        }
       );
 
       this.accessToken = response.data.access_token;
