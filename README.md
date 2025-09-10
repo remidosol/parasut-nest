@@ -2,10 +2,14 @@
 
 This document provides comprehensive documentation for the `parasut-nest` npm package, a NestJS module designed to interact with the Parasut API. It covers the project structure, core components, common utilities, data transfer objects (DTOs), and detailed explanations of each module and its functionalities.
 
+> **🚀 Quick Start**: For the most comprehensive and up-to-date documentation with AI-powered assistance, visit our **[DeepWiki Documentation](https://deepwiki.com/remidosol/parasut-nest)** and use the built-in **AI Assistant** ([Example](https://deepwiki.com/search/how-can-i-create-einvoice-via_c4fe8b52-062b-4c72-8f15-7365bc294c35)) for instant help with your questions.
+
 ## Table of Contents
 
 1. [Project Overview](#1-project-overview)
 2. [Installation and Usage](#2-installation-and-usage)
+    * [DeepWiki Documentation & AI Assistant](#21-deepwiki-documentation--ai-assistant)
+    * [Package Installation](#22-package-installation)
 3. [Core Components](#3-core-components)
     * [ParasutModule](#31-parasutmodule)
     * [ParasutHttpClient](#32-parasuthttpclient)
@@ -45,7 +49,32 @@ The `parasut-nest` package is a NestJS module designed to provide a structured a
 
 ## 2. Installation and Usage
 
-*(This section will provide details on how to install the npm package and basic usage examples for synchronous and asynchronous module registration. As this information wasn't explicitly present in the scanned files, it will be a general placeholder.)*
+### 2.1. DeepWiki Documentation & AI Assistant
+
+**📚 Comprehensive Documentation**: For the most up-to-date and detailed documentation, visit our DeepWiki page:
+**[https://deepwiki.com/remidosol/parasut-nest](https://deepwiki.com/remidosol/parasut-nest)**
+
+The DeepWiki provides:
+
+* **Interactive Documentation**: Browse through all modules, services, and DTOs with live examples
+* **API Reference**: Complete method signatures, parameters, and return types
+* **Code Examples**: Real-world usage patterns and best practices
+* **Troubleshooting Guides**: Common issues and their solutions
+* **Version History**: Track changes and updates across package versions
+
+**🤖 AI-Powered Assistance**: Get instant help with your Parasut integration questions directly on the DeepWiki platform. Simply ask questions like "How can I create an e-invoice?" or "How do I handle bulk operations?" and get detailed, context-aware responses.
+
+The DeepWiki AI assistant can help you with:
+
+* **Code Generation**: Generate complete implementation examples for your specific use case
+* **Problem Solving**: Get step-by-step solutions to integration challenges
+* **Best Practices**: Learn optimal patterns for using the Parasut API
+* **Error Resolution**: Debug issues with detailed explanations and fixes
+* **Custom Implementations**: Get guidance on extending the package for your needs
+
+> **💡 Pro Tip**: Use the DeepWiki AI assistant for complex scenarios like e-invoice creation, bulk operations, or custom integrations. It understands the full context of the Parasut API and this package. You can ask specific questions and get tailored code examples and solutions.
+
+### 2.2. Package Installation
 
 To install the package, run:
 
@@ -264,7 +293,8 @@ The `parasut-nest` package is organized into several modules, each responsible f
 
 The package supports two main usage patterns:
 
-**Pattern 1: Import the main module (recommended for most use cases)**
+#### Pattern 1: Import the main module (recommended for most use cases)
+
 ```typescript
 import { ParasutModule } from '@remidosol/parasut-nest';
 
@@ -279,7 +309,8 @@ import { ParasutModule } from '@remidosol/parasut-nest';
 export class AppModule {}
 ```
 
-**Pattern 2: Import individual feature modules (for selective usage)**
+#### Pattern 2: Import individual feature modules (for selective usage)
+
 ```typescript
 import { ParasutContactModule } from '@remidosol/parasut-nest';
 
@@ -291,7 +322,8 @@ import { ParasutContactModule } from '@remidosol/parasut-nest';
 export class AppModule {}
 ```
 
-**Pattern 3: Import the core module directly (for advanced use cases)**
+#### Pattern 3: Import the core module directly (for advanced use cases)
+
 ```typescript
 import { ParasutCoreModule } from '@remidosol/parasut-nest';
 
