@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0 (2025-09-10)
+
+* feat: enhance authentication flow in ParasutHttpClient ([ee7166b](https://github.com/remidosol/parasut-nest/commit/ee7166b))
+* feat: enhance OAuth token refresh flow in ParasutHttpClient ([e40aba6](https://github.com/remidosol/parasut-nest/commit/e40aba6))
+* docs: enhance README with DeepWiki integration and AI assistance ([d2a5c24](https://github.com/remidosol/parasut-nest/commit/d2a5c24))
+
 ## 1.3.0 (2025-09-03)
 
 * feat: add module exports to index for improved organization ([4ba1a9f](https://github.com/remidosol/parasut-nest/commit/4ba1a9f))
