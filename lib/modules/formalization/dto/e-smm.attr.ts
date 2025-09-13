@@ -7,17 +7,39 @@ import {
 } from "../../../types";
 
 export type ESmmAttributes = {
-  id?: string;
-  created_at?: Date;
-  updated_at?: Date;
-  status?: string;
+  created_at: string; // ISO 8601 date format
+  updated_at: string; // ISO 8601 date format
+  printed_at: string; // ISO 8601 date format
+  uuid: string;
+  vkn: string;
+  invoice_number: number;
+  is_printed: boolean;
+  pdf_url: string;
 };
 
 export type ESmmResponseRels = {
   sales_invoice?: ResponseRelationship<"sales_invoices">;
 };
 
-export type ESmmRequestResource = RequestResource<"e_smms", any>;
+export type ESmmRequestAttributes = {
+  vat_withholding_code: string;
+  note: string;
+};
+
+export type ESmmRequestRels = {
+  sales_invoice: {
+    data: {
+      type: "sales_invoices";
+      id: string;
+    };
+  };
+};
+
+export type ESmmRequestResource = RequestResource<
+  "e_smms",
+  ESmmRequestAttributes,
+  ESmmRequestRels
+>;
 
 export type ESmmResponseResource = ResponseResource<
   "e_smms",

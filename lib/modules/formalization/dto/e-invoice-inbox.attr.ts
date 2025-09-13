@@ -6,10 +6,14 @@ import {
 } from "../../../types";
 
 export type EInvoiceInboxAttributes = {
-  id?: string;
-  created_at?: Date;
-  updated_at?: Date;
-  vkn?: string;
+  vkn: string;
+  e_invoice_address: string;
+  name: string;
+  inbox_type: string;
+  address_registered_at: string; // ISO 8601
+  registered_at: string; // ISO 8601
+  created_at: string; // ISO 8601 date format
+  updated_at: string; // ISO 8601 date format
 };
 
 export type EInvoiceInboxRequestResource = RequestResource<

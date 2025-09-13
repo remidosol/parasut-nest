@@ -4,6 +4,7 @@ import { ParasutHttpClient } from "../../../parasut.client";
 import { RequestIncludeByType } from "../../../types";
 import {
   CreatePurchaseBillRequest,
+  PayPurchaseBillRequest,
   UpdatePurchaseBillRequest,
 } from "./dto/request";
 import { PayPurchaseBillResponse } from "./dto/response/payment-response.dto";
@@ -184,14 +185,14 @@ export class ParasutPurchaseBillService {
    */
   async payPurchaseBill(
     id: number,
-    payload: any,
+    payload: PayPurchaseBillRequest,
     include?: RequestIncludeByType<"purchase_bills">
   ): Promise<PayPurchaseBillResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include.join(",");
     return this.parasutClient.post<
       PayPurchaseBillResponse,
-      any,
+      PayPurchaseBillRequest,
       { include?: string }
     >(`/purchase_bills/${id}/payments`, params, payload);
   }

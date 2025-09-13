@@ -2,7 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../../../common/parasut.logger";
 import { ParasutHttpClient } from "../../../parasut.client";
 import { RequestIncludeByType } from "../../../types";
-import { CreateSalaryRequest, UpdateSalaryRequest } from "./dto/request";
+import {
+  CreateSalaryRequest,
+  PaySalaryRequest,
+  UpdateSalaryRequest,
+} from "./dto/request";
 import { PaySalaryResponse } from "./dto/response/payment-response.dto";
 import {
   CreateSalaryResponse,
@@ -172,14 +176,14 @@ export class ParasutSalaryService {
    */
   async paySalary(
     id: number,
-    payload: any,
+    payload: PaySalaryRequest,
     include?: RequestIncludeByType<"salaries">
   ): Promise<PaySalaryResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include.join(",");
     return this.parasutClient.post<
       PaySalaryResponse,
-      any,
+      PaySalaryRequest,
       { include?: string }
     >(`/salaries/${id}/payments`, params, payload);
   }

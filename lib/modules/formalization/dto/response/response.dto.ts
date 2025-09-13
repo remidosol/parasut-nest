@@ -28,19 +28,34 @@ export type GetEArchiveResponse = SingleResponse<
   EArchiveResponseIncluded[]
 >;
 
-export type EArchivePdfResponse = any;
+export type EDocumentPdfResponse = {
+  data: {
+    type: "e_document_pdfs";
+    id: string;
+    attributes: {
+      url: string;
+      expires_at: string; // ISO 8601
+    };
+    relationships: null;
+  };
+};
 
-export type CreateEInvoiceResponse = SingleResponse<
-  EInvoiceResponseResource,
-  EInvoiceResponseIncluded[]
->;
+export type CreateEInvoiceResponse = {
+  data: {
+    id: string;
+    type: "trackable_jobs";
+    attributes: {
+      status: "running" | "done" | "error";
+      errors?: string[];
+    };
+    relationships: null;
+  };
+};
 
 export type GetEInvoiceResponse = SingleResponse<
   EInvoiceResponseResource,
   EInvoiceResponseIncluded[]
 >;
-
-export type EInvoicePdfResponse = any;
 
 export type CreateESmmResponse = SingleResponse<
   ESmmResponseResource,
@@ -51,5 +66,3 @@ export type GetESmmResponse = SingleResponse<
   ESmmResponseResource,
   ESmmResponseIncluded[]
 >;
-
-export type ESmmPdfResponse = any;

@@ -3,7 +3,9 @@ import { ParasutLoggerService } from "../../../common/parasut.logger";
 import { ParasutHttpClient } from "../../../parasut.client";
 import { RequestIncludeByType } from "../../../types";
 import {
+  ConvertEstimateToInvoiceRequest,
   CreateSalesInvoiceRequest,
+  PaySalesInvoiceRequest,
   UpdateSalesInvoiceRequest,
 } from "./dto/request";
 import { PaySalesInvoiceResponse } from "./dto/response/payment-response.dto";
@@ -145,14 +147,15 @@ export class ParasutSalesInvoiceService {
    */
   async paySalesInvoice(
     id: number,
-    payload: any,
+    payload: PaySalesInvoiceRequest,
     include?: RequestIncludeByType<"sales_invoices">
   ): Promise<PaySalesInvoiceResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include.join(",");
+
     return this.parasutClient.post<
       PaySalesInvoiceResponse,
-      any,
+      PaySalesInvoiceRequest,
       { include?: string }
     >(`/sales_invoices/${id}/payments`, params, payload);
   }
@@ -169,6 +172,7 @@ export class ParasutSalesInvoiceService {
   ): Promise<boolean> {
     const params: { include?: string } = {};
     if (include) params.include = include.join(",");
+
     return this.parasutClient.delete(`/sales_invoices/${id}/cancel`, params);
   }
 
@@ -233,20 +237,21 @@ export class ParasutSalesInvoiceService {
    * Converts an estimate to an invoice.
    * This typically applies when the sales_invoice ID is actually an estimate ID.
    * @param id - The ID of the estimate (which is a type of sales_invoice) to convert.
-   * @param payload - The payload required for conversion, usually minimal or specific to define invoice attributes.
+   * @param payload - The payload required for conversion with invoice attributes and relationships.
    * @param include - Comma-separated list of relationships to include in the response.
    * @returns The newly created invoice.
    */
   async convertEstimateToInvoice(
     id: number,
-    payload: any,
+    payload: ConvertEstimateToInvoiceRequest,
     include?: RequestIncludeByType<"sales_invoices">
   ): Promise<GetSalesInvoiceResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include.join(",");
+
     return this.parasutClient.patch<
       GetSalesInvoiceResponse,
-      any,
+      ConvertEstimateToInvoiceRequest,
       { include?: string }
     >(`/sales_invoices/${id}/convert_to_invoice`, params, payload);
   }

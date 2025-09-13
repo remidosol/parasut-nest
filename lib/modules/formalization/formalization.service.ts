@@ -2,12 +2,16 @@ import { Injectable } from "@nestjs/common";
 import { ParasutLoggerService } from "../../common/parasut.logger";
 import { ParasutHttpClient } from "../../parasut.client";
 import {
+  CreateEArchiveRequest,
+  CreateEInvoiceRequest,
+  CreateESmmRequest,
+  EInvoiceInboxQueryParams,
+} from "./dto/request";
+import {
   CreateEArchiveResponse,
   CreateEInvoiceResponse,
   CreateESmmResponse,
-  EArchivePdfResponse,
-  EInvoicePdfResponse,
-  ESmmPdfResponse,
+  EDocumentPdfResponse,
   GetEArchiveResponse,
   GetEInvoiceResponse,
   GetESmmResponse,
@@ -27,26 +31,29 @@ export class ParasutFormalizationService {
 
   /**
    * Retrieves a list of e-invoice inboxes.
-   * @param queryParams - Optional parameters for filtering and pagination.
-   *   - filter: { vkn?: string }
-   *   - page: { number?: number, size?: number }
+   * @param queryParams - Optional parameters for filtering, sorting, and pagination.
    * @returns A list of e-invoice inboxes.
    */
   async getEInvoiceInboxes(
-    queryParams?: any
+    queryParams?: EInvoiceInboxQueryParams
   ): Promise<IndexEInvoiceInboxResponse> {
     const params: any = {};
+
     if (queryParams) {
+      // Filter parameters
       if (queryParams.filter) {
         if (queryParams.filter.vkn)
           params["filter[vkn]"] = queryParams.filter.vkn;
       }
+
+      // Pagination
       if (queryParams.page) {
         if (queryParams.page.number)
           params["page[number]"] = queryParams.page.number;
         if (queryParams.page.size) params["page[size]"] = queryParams.page.size;
       }
     }
+
     return this.parasutClient.get<IndexEInvoiceInboxResponse, any>(
       "/e_invoice_inboxes",
       params
@@ -60,14 +67,14 @@ export class ParasutFormalizationService {
    * @param payload - The e-archive data.
    * @returns The created e-archive.
    */
-  async createEArchive(payload: any): Promise<CreateEArchiveResponse> {
-    // Note: The 'include' parameter is not specified in the image for create.
-    // If it were available, it would be added like other services.
-    return this.parasutClient.post<CreateEArchiveResponse, any, any>(
-      "/e_archives",
-      {},
-      payload
-    );
+  async createEArchive(
+    payload: CreateEArchiveRequest
+  ): Promise<CreateEArchiveResponse> {
+    return this.parasutClient.post<
+      CreateEArchiveResponse,
+      CreateEArchiveRequest,
+      any
+    >("/e_archives", {}, payload);
   }
 
   /**
@@ -93,8 +100,8 @@ export class ParasutFormalizationService {
    * @param id - The ID of the e-archive.
    * @returns The e-archive PDF data.
    */
-  async getEArchivePdf(id: string): Promise<EArchivePdfResponse> {
-    return this.parasutClient.get<EArchivePdfResponse, any>(
+  async getEArchivePdf(id: string): Promise<EDocumentPdfResponse> {
+    return this.parasutClient.get<EDocumentPdfResponse, any>(
       `/e_archives/${id}/pdf`,
       {}
     );
@@ -107,13 +114,14 @@ export class ParasutFormalizationService {
    * @param payload - The e-invoice data.
    * @returns The created e-invoice.
    */
-  async createEInvoice(payload: any): Promise<CreateEInvoiceResponse> {
-    // Note: The 'include' parameter is not specified in the image for create.
-    return this.parasutClient.post<CreateEInvoiceResponse, any, any>(
-      "/e_invoices",
-      {},
-      payload
-    );
+  async createEInvoice(
+    payload: CreateEInvoiceRequest
+  ): Promise<CreateEInvoiceResponse> {
+    return this.parasutClient.post<
+      CreateEInvoiceResponse,
+      CreateEInvoiceRequest,
+      any
+    >("/e_invoices", {}, payload);
   }
 
   /**
@@ -139,8 +147,8 @@ export class ParasutFormalizationService {
    * @param id - The ID of the e-invoice.
    * @returns The e-invoice PDF data.
    */
-  async getEInvoicePdf(id: string): Promise<EInvoicePdfResponse> {
-    return this.parasutClient.get<EInvoicePdfResponse, any>(
+  async getEInvoicePdf(id: string): Promise<EDocumentPdfResponse> {
+    return this.parasutClient.get<EDocumentPdfResponse, any>(
       `/e_invoices/${id}/pdf`,
       {}
     );
@@ -153,9 +161,8 @@ export class ParasutFormalizationService {
    * @param payload - The e-SMM data.
    * @returns The created e-SMM.
    */
-  async createESmm(payload: any): Promise<CreateESmmResponse> {
-    // Note: The 'include' parameter is not specified in the image for create.
-    return this.parasutClient.post<CreateESmmResponse, any, any>(
+  async createESmm(payload: CreateESmmRequest): Promise<CreateESmmResponse> {
+    return this.parasutClient.post<CreateESmmResponse, CreateESmmRequest, any>(
       "/e_smms",
       {},
       payload
@@ -182,8 +189,8 @@ export class ParasutFormalizationService {
    * @param id - The ID of the e-SMM.
    * @returns The e-SMM PDF data.
    */
-  async getESmmPdf(id: string): Promise<ESmmPdfResponse> {
-    return this.parasutClient.get<ESmmPdfResponse, any>(
+  async getESmmPdf(id: string): Promise<EDocumentPdfResponse> {
+    return this.parasutClient.get<EDocumentPdfResponse, any>(
       `/e_smms/${id}/pdf`,
       {}
     );
