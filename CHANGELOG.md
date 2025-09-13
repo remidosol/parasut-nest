@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>1.4.1 (2025-09-13)</small>
+
+* refactor: enhance type safety and request handling in services ([7891a4f](https://github.com/remidosol/parasut-nest/commit/7891a4f))
+
 ## 1.4.0 (2025-09-10)
 
 * feat: enhance authentication flow in ParasutHttpClient ([ee7166b](https://github.com/remidosol/parasut-nest/commit/ee7166b))
