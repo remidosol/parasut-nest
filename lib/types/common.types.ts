@@ -37,4 +37,5 @@ export type EntityType =
   | "products"
   | "shipment_documents"
   | "stock_update_details"
-  | "profiles";
+  | "profiles"
+  | "sharing_forms";

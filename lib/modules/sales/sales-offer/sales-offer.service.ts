@@ -4,13 +4,20 @@ import { ParasutHttpClient } from "../../../parasut.client";
 import { RequestIncludeByType } from "../../../types";
 import {
   CreateSalesOfferRequest,
+  SalesOfferQueryParams,
+  ShareSalesOfferByEmailRequest,
   UpdateSalesOfferRequest,
+  UpdateSalesOfferStatusRequest,
 } from "./dto/request";
 import {
   CreateSalesOfferResponse,
+  GetSalesOfferDetailsResponse,
   GetSalesOfferResponse,
   IndexSalesOfferResponse,
+  SalesOfferPdfResponse,
+  ShareSalesOfferByEmailResponse,
   UpdateSalesOfferResponse,
+  UpdateSalesOfferStatusResponse,
 } from "./dto/response/response.dto";
 
 @Injectable()
@@ -25,15 +32,15 @@ export class ParasutSalesOfferService {
   /**
    * Retrieves a list of sales offers.
    * @param queryParams - Optional parameters for filtering, sorting, pagination, and inclusion.
-   *   - filter: { archived?: boolean, query?: string, invoice_status?: string, status?: string }
-   *   - sort: string (e.g., "id", "issue_date", "-net_total")
-   *   - page: { number?: number, size?: number }
-   *   - include: string (e.g., "contact,sales_invoice")
    * @returns A list of sales offers.
    */
-  async getSalesOffers(queryParams?: any): Promise<IndexSalesOfferResponse> {
+  async getSalesOffers(
+    queryParams?: SalesOfferQueryParams
+  ): Promise<IndexSalesOfferResponse> {
     const params: any = {};
+
     if (queryParams) {
+      // Filter parameters
       if (queryParams.filter) {
         if (queryParams.filter.archived !== undefined)
           params["filter[archived]"] = queryParams.filter.archived;
@@ -44,14 +51,23 @@ export class ParasutSalesOfferService {
         if (queryParams.filter.status)
           params["filter[status]"] = queryParams.filter.status;
       }
-      if (queryParams.sort) params.sort = queryParams.sort;
-      if (queryParams.page) {
-        if (queryParams.page.number)
-          params["page[number]"] = queryParams.page.number;
-        if (queryParams.page.size) params["page[size]"] = queryParams.page.size;
+
+      // Sorting (default: "id")
+      if (queryParams.sort) {
+        params.sort = queryParams.sort;
       }
-      if (queryParams.include) params.include = queryParams.include;
+
+      // Pagination
+      if (queryParams.page?.number) {
+        params["page[number]"] = queryParams.page.number;
+      }
+
+      // Include relationships
+      if (queryParams.include) {
+        params.include = queryParams.include.join(",");
+      }
     }
+
     return this.parasutClient.get<IndexSalesOfferResponse, any>(
       "/sales_offers",
       params
@@ -70,6 +86,7 @@ export class ParasutSalesOfferService {
   ): Promise<CreateSalesOfferResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include.join(",");
+
     return this.parasutClient.post<
       CreateSalesOfferResponse,
       CreateSalesOfferRequest,
@@ -89,6 +106,7 @@ export class ParasutSalesOfferService {
   ): Promise<GetSalesOfferResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include.join(",");
+
     return this.parasutClient.get<GetSalesOfferResponse, { include?: string }>(
       `/sales_offers/${id}`,
       params
@@ -109,6 +127,7 @@ export class ParasutSalesOfferService {
   ): Promise<UpdateSalesOfferResponse> {
     const params: { include?: string } = {};
     if (include) params.include = include.join(",");
+
     return this.parasutClient.put<
       UpdateSalesOfferResponse,
       UpdateSalesOfferRequest,
@@ -129,16 +148,14 @@ export class ParasutSalesOfferService {
    * Requests the PDF generation for a sales offer.
    * The response will contain information about the trackable job.
    * @param id - The ID of the sales offer.
-   * @returns Information about the PDF generation job.
+   * @returns Information about the PDF generation job including URL, status, and tracking details.
    */
-  async getSalesOfferPdf(id: number): Promise<any> {
-    // The API endpoint is POST for PDF generation, possibly to start an async job.
-    // No request body is shown in the image for this specific POST.
-    return this.parasutClient.post<any, any, Record<string, never>>(
-      `/sales_offers/${id}/pdf`,
-      {},
-      {}
-    );
+  async getSalesOfferPdf(id: number): Promise<SalesOfferPdfResponse> {
+    return this.parasutClient.post<
+      SalesOfferPdfResponse,
+      any,
+      Record<string, never>
+    >(`/sales_offers/${id}/pdf`);
   }
 
   /**
@@ -147,10 +164,8 @@ export class ParasutSalesOfferService {
    * @returns The archived sales offer.
    */
   async archiveSalesOffer(id: number): Promise<GetSalesOfferResponse> {
-    // No request body or query params shown in the image for archive.
     return this.parasutClient.patch<GetSalesOfferResponse, undefined>(
-      `/sales_offers/${id}/archive`,
-      {}
+      `/sales_offers/${id}/archive`
     );
   }
 
@@ -160,10 +175,8 @@ export class ParasutSalesOfferService {
    * @returns The unarchived sales offer.
    */
   async unarchiveSalesOffer(id: number): Promise<GetSalesOfferResponse> {
-    // No request body or query params shown in the image for unarchive.
     return this.parasutClient.patch<GetSalesOfferResponse, undefined>(
-      `/sales_offers/${id}/unarchive`,
-      {}
+      `/sales_offers/${id}/unarchive`
     );
   }
 
@@ -175,49 +188,50 @@ export class ParasutSalesOfferService {
    *   - include: string (e.g., "product")
    * @returns The details of the sales offer.
    */
-  async getSalesOfferDetails(id: number, queryParams?: any): Promise<any> {
+  async getSalesOfferDetails(
+    id: number,
+    queryParams?: SalesOfferQueryParams
+  ): Promise<GetSalesOfferDetailsResponse> {
     const params: any = {};
+
     if (queryParams) {
       if (queryParams.page && queryParams.page.size) {
         params["page[size]"] = queryParams.page.size;
       }
       if (queryParams.include) {
-        params.include = queryParams.include;
+        params.include = queryParams.include.join(",");
       }
     }
-    return this.parasutClient.get<any, any>(
-      `/sales_offers/${id}/details`,
-      params
-    );
+
+    return this.parasutClient.get<
+      GetSalesOfferDetailsResponse,
+      { include?: string }
+    >(`/sales_offers/${id}/details`, params);
   }
 
   /**
    * Updates the status of a sales offer.
    * @param id - The ID of the sales offer.
-   * @param attributesPayload - The attributes to update for the sales offer status.
+   * @param payload - The attributes to update for the sales offer status.
    * @param include - Comma-separated list of relationships to include in the response (part of the request body).
    * @returns The updated sales offer.
    */
   async updateSalesOfferStatus(
     id: number,
-    attributesPayload: any,
-    include?: string
-  ): Promise<any> {
-    const body: any = {
-      data: {
-        id: id.toString(),
-        type: "sales_offers",
-        attributes: attributesPayload,
-      },
-    };
+    payload: UpdateSalesOfferStatusRequest,
+    include?: RequestIncludeByType<"sales_offers">
+  ): Promise<UpdateSalesOfferStatusResponse> {
+    const params: { include?: string } = {};
+
     if (include) {
-      body.include = include;
+      params.include = include.join(",");
     }
-    return this.parasutClient.patch<any, any, any>(
-      `/sales_offers/${id}/update_status`,
-      {}, // No query parameters
-      body
-    );
+
+    return this.parasutClient.patch<
+      UpdateSalesOfferStatusResponse,
+      UpdateSalesOfferStatusRequest,
+      { include?: string }
+    >(`/sales_offers/${id}/update_status`, params, payload);
   }
 
   /**
@@ -228,17 +242,19 @@ export class ParasutSalesOfferService {
    * @returns The response from the sharing operation.
    */
   async shareSalesOfferByEmail(
-    sharingPayload: any,
-    include?: string
-  ): Promise<any> {
+    payload: ShareSalesOfferByEmailRequest,
+    include?: RequestIncludeByType<"sales_offers">
+  ): Promise<ShareSalesOfferByEmailResponse> {
     const params: { include?: string } = {};
-    if (include) params.include = include;
-    // This uses the generic /sharings endpoint.
-    // The sharingPayload should be structured as { data: { type: "sharing_forms", attributes: {...}, relationships: {...} } }
-    return this.parasutClient.post<any, any, any>(
-      "/sharings",
-      params,
-      sharingPayload
-    );
+
+    if (include) {
+      params.include = include.join(",");
+    }
+
+    return this.parasutClient.post<
+      ShareSalesOfferByEmailResponse,
+      ShareSalesOfferByEmailRequest,
+      { include?: string }
+    >("/sharings", params, payload);
   }
 }

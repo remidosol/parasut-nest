@@ -71,6 +71,9 @@ export type SalesOfferRequestResource = RequestResource<
 export type SalesOfferResponseRels = {
   contact?: ResponseRelationship<"contacts">;
   sales_invoice?: ResponseRelationship<"sales_invoices">;
+  activities?: ResponseRelationship<"activities", true>;
+  sharings?: ResponseRelationship<"sharings", true>;
+  details?: ResponseRelationship<"sales_offer_details", true>;
 };
 
 export type SalesOfferResponseResource = ResponseResource<
@@ -84,3 +87,96 @@ type SalesOfferResponseRelInc =
 
 export type SalesOfferResponseIncluded =
   PromoteResponseIdentifiers<SalesOfferResponseRelInc>;
+
+// Added: detail response resource and product include
+export type SalesOfferDetailAttributes = {
+  description: string;
+  net_total: number;
+  unit_price: number;
+  vat_rate: number;
+  quantity: number;
+  discount_type: string;
+  discount_value: number;
+  communications_tax_rate: number;
+  excise_duty_type: string;
+  invoice_discount: number;
+  excise_duty: number;
+  excise_duty_rate: number;
+  discount: number;
+  communications_tax: number;
+  detail_no: number;
+  net_total_without_invoice_discount: number;
+  vat_withholding: number;
+  vat_withholding_rate: number;
+  accommodation_tax_rate: number;
+  accommodation_tax: number;
+  accommodation_tax_exempt: boolean;
+  created_at: string;
+  updated_at: string;
+  excise_duty_value: number;
+};
+
+export type SalesOfferDetailResponseRels = {
+  product?: ResponseRelationship<"products">;
+};
+
+export type SalesOfferDetailResponseResource = ResponseResource<
+  "sales_offer_details",
+  SalesOfferDetailAttributes,
+  SalesOfferDetailResponseRels
+>;
+
+type SalesOfferDetailResponseRelInc =
+  ResponseIncludedFrom<SalesOfferDetailResponseResource>;
+
+export type SalesOfferDetailResponseIncluded =
+  PromoteResponseIdentifiers<SalesOfferDetailResponseRelInc>;
+
+// Sharing request/response resources
+export type SharingFormRequestAttributes = {
+  email?: {
+    addresses?: string;
+    subject?: string;
+    body?: string;
+  };
+  portal?: {
+    has_online_collection?: boolean;
+    has_online_payment_reminder?: boolean;
+    has_referral_link?: boolean;
+  };
+  properties?: Record<string, any>;
+};
+
+export type SharingFormRequestResource = RequestResource<
+  "sharing_forms",
+  SharingFormRequestAttributes,
+  {
+    shareable: RequestRelationship<"sales_offers">;
+  }
+>;
+
+export type SharingAttributes = {
+  created_at: string;
+  email: string;
+  email_status: string;
+  message: string;
+  properties: Record<string, any>;
+  subject: string;
+  updated_at: string;
+};
+
+export type SharingResponseRels = {
+  shareable?: ResponseRelationship<"shareable">;
+  collaborator?: ResponseRelationship<"collaborators">;
+};
+
+export type SharingResponseResource = ResponseResource<
+  "sharings",
+  SharingAttributes,
+  SharingResponseRels
+>;
+
+type SharingResponseRelInc = ResponseIncludedFrom<SharingResponseResource>;
+
+export type SharingResponseIncluded =
+  PromoteResponseIdentifiers<SharingResponseRelInc>;

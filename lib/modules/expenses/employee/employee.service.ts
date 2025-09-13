@@ -159,16 +159,20 @@ export class ParasutEmployeeService {
    * @param include - Comma-separated list of relationships to include in the response (e.g., "category,managed_by_user,managed_by_user_role").
    * @returns The archived employee.
    */
-  async archiveEmployee(id: number, include?: string): Promise<any> {
+  async archiveEmployee(
+    id: number,
+    include?: RequestIncludeByType<"employees">
+  ): Promise<GetEmployeeResponse> {
     const params: { include?: string } = {};
     if (include) {
-      params.include = include;
+      params.include = include.join(",");
     }
 
-    const response = await this.parasutClient.patch<GetEmployeeResponse, any>(
-      `/employees/${id}/archive`,
-      params
-    );
+    const response = await this.parasutClient.patch<
+      GetEmployeeResponse,
+      undefined,
+      { include?: string }
+    >(`/employees/${id}/archive`, params);
     return response;
   }
 
@@ -187,10 +191,11 @@ export class ParasutEmployeeService {
       params.include = include.join(",");
     }
 
-    const response = await this.parasutClient.patch<GetEmployeeResponse, any>(
-      `/employees/${id}/unarchive`,
-      params
-    );
+    const response = await this.parasutClient.patch<
+      GetEmployeeResponse,
+      undefined,
+      { include?: string }
+    >(`/employees/${id}/unarchive`, params);
     return response;
   }
 }
