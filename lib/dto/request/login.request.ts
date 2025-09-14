@@ -3,7 +3,6 @@ import {
   IsEnum,
   IsNotEmpty,
   IsString,
-  IsUrl,
   ValidateIf,
 } from "class-validator";
 import { GrantType } from "../../parasut.enum";
@@ -38,7 +37,7 @@ export class ParasutAuthDto {
       o.grant_type === GrantType.AUTHORIZATION_CODE ||
       o.grant_type === GrantType.PASSWORD
   )
-  @IsUrl({ require_tld: false })
+  @IsString({ message: "Invalid redirect uri" })
   redirect_uri?: string;
 
   constructor(dto?: ParasutAuthDto) {
