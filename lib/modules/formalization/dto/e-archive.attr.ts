@@ -34,21 +34,21 @@ export type EArchiveRequestAttributes = {
     sales_excise_duty_code: number;
   }>;
   internet_sale?: {
-    url: string;
-    payment_type:
+    url?: string;
+    payment_type?:
       | "KREDIKARTI/BANKAKARTI"
       | "EFT/HAVALE"
       | "KAPIDAODEME"
       | "ODEMEARACISI";
-    payment_platform: string;
-    payment_date: string;
+    payment_platform?: string;
+    payment_date?: string;
   };
   shipment?: {
-    title: string;
-    vkn: string;
-    name: string;
-    tckn: string;
-    date: string;
+    title?: string;
+    vkn?: string;
+    name?: string;
+    tckn?: string;
+    date?: string;
   };
 };
 
