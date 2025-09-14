@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>1.4.2 (2025-09-14)</small>
+
+* refactor: update EArchiveRequestAttributes for optional fields ([50bc493](https://github.com/remidosol/parasut-nest/commit/50bc493))
+
 ## <small>1.4.1 (2025-09-13)</small>
 
 * refactor: enhance type safety and request handling in services ([7891a4f](https://github.com/remidosol/parasut-nest/commit/7891a4f))
