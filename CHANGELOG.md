@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>1.4.3 (2025-09-14)</small>
+
+* refactor: update redirect_uri validation in ParasutAuthDto ([b112eac](https://github.com/remidosol/parasut-nest/commit/b112eac))
+
 ## <small>1.4.2 (2025-09-14)</small>
 
 * refactor: update EArchiveRequestAttributes for optional fields ([50bc493](https://github.com/remidosol/parasut-nest/commit/50bc493))
